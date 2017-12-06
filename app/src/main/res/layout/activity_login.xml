@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/log_bg">
+
+    <ProgressBar
+        android:id="@+id/mProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30px"
+            android:layout_marginTop="82px"
+            android:text="@string/welcome"
+            android:textColor="#fff"
+            android:textSize="24px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30px"
+            android:layout_marginTop="50px"
+            android:text="@string/username_phonenumber"
+            android:textColor="#fff"
+            android:textSize="13px" />
+
+        <EditText
+            android:id="@+id/mEtUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30px"
+            android:layout_marginRight="30px"
+            android:layout_marginTop="15px"
+            android:background="@null"
+            android:hint="@string/edit_phonenumber"
+            android:textColor="#fff"
+            android:textColorHint="#55c2bfbf"
+            android:textSize="18px" />
+
+        <include layout="@layout/view_line" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30px"
+            android:layout_marginTop="50px"
+            android:text="@string/password"
+            android:textColor="#fff"
+            android:textSize="13px" />
+
+        <EditText
+            android:id="@+id/mEtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30px"
+            android:layout_marginRight="30px"
+            android:layout_marginTop="15px"
+            android:background="@null"
+            android:hint="@string/edit_password"
+            android:inputType="textPassword"
+            android:textColor="#fff"
+            android:textColorHint="#55c2bfbf"
+            android:textSize="18px" />
+
+        <include layout="@layout/view_line" />
+
+
+        <Button
+            android:id="@+id/mBtLogin"
+            android:layout_width="320px"
+            android:layout_height="45px"
+            android:layout_gravity="center"
+            android:layout_marginTop="100px"
+            android:background="@mipmap/log_button"
+            android:text="@string/login"
+            android:textColor="#fff"
+            android:textSize="18px" />
+    </LinearLayout>
+</RelativeLayout>
