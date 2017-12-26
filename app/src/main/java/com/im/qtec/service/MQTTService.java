@@ -1,6 +1,7 @@
 package com.im.qtec.service;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,6 +10,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.blankj.utilcode.util.DeviceUtils;
+import com.im.qtec.activity.MainActivity;
+import com.im.qtec.constants.ConstantValues;
+import com.im.qtec.db.Chat;
+import com.im.qtec.db.Conversation;
+import com.im.qtec.event.MessageEvent;
+import com.im.qtec.utils.SPUtils;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -20,6 +29,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
 
 /**
  * MQTT长连接服务
@@ -35,24 +47,31 @@ public class MQTTService extends Service {
     private MqttConnectOptions conOpt;
 
     //    private String host = "tcp://10.0.2.2:61613";
-    private String host = "tcp://192.168.90.35:1883";
-    private String userName = "admin";
+    private String host = "tcp://192.168.91.137:1883";
+    private String userName;
     private String passWord = "password";
-    private static String myTopic = "topic";
-    private String clientId = "faker";
+    private static String myTopic;
+    private String clientId = DeviceUtils.getAndroidID();
+    private int myid;
+    private boolean isSubscribed;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        userName = myid + "";
+        myid = SPUtils.getInt(this, ConstantValues.USER_ID, -1);
+        myTopic = "single/" + myid + "/#";
         init();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public void publish(String msg) {
-        String topic = myTopic;
+    public void publish(byte[] msg, int userid) {
+        String topic = "single/" + userid + "/" + myid;
         Integer qos = 0;
         Boolean retained = false;
         try {
-            client.publish(topic, msg.getBytes(), qos.intValue(), retained.booleanValue());
+            client.publish(topic, msg, qos.intValue(), retained.booleanValue());
+            saveMessage(msg, 1, userid);
+            EventBus.getDefault().post(new MessageEvent());
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -81,7 +100,7 @@ public class MQTTService extends Service {
         // last will message
         boolean doConnect = true;
         String message = "{\"terminal_uid\":\"" + clientId + "\"}";
-        String topic = myTopic;
+        String topic = "single/" + myid;
         Integer qos = 0;
         Boolean retained = false;
         if ((!message.equals("")) || (!topic.equals(""))) {
@@ -115,9 +134,10 @@ public class MQTTService extends Service {
      * 连接MQTT服务器
      */
     private void doClientConnection() {
-        if (!client.isConnected() && isConnectIsNomarl()) {
+        if (!client.isConnected()) {
             try {
                 client.connect(conOpt, null, iMqttActionListener);
+                //client.unsubscribe(myTopic,this, iMqttActionListener);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
@@ -133,7 +153,10 @@ public class MQTTService extends Service {
             Log.i(TAG, "连接成功 ");
             try {
                 // 订阅myTopic话题
+                //if (!isSubscribed) {
                 client.subscribe(myTopic, 1);
+                //   isSubscribed = true;
+                // }
             } catch (MqttException e) {
                 e.printStackTrace();
             }
@@ -153,17 +176,21 @@ public class MQTTService extends Service {
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
 
-            String str1 = new String(message.getPayload());
+//            String str1 = new String(message.getPayload());
 //            MqttMessage msg = new MqttMessage();
 //            msg.setMessage(str1);
-            EventBus.getDefault().post(message);
-            String str2 = topic + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
-            Log.i(TAG, "messageArrived:" + str1);
-            Log.i(TAG, str2);
+            int lastIndex = topic.lastIndexOf("/");
+            String userid = topic.substring(lastIndex + 1);
+            int id = Integer.valueOf(userid);
+            saveMessage(message.getPayload(), 0, id);
+            EventBus.getDefault().post(new MessageEvent());
+//            String str2 = topic + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
+//            Log.i(TAG, "messageArrived:" + str1);
+//            Log.i(TAG, str2);
         }
 
         @Override
-        public void deliveryComplete(IMqttDeliveryToken arg0) {
+        public void deliveryComplete(IMqttDeliveryToken token) {
 
         }
 
@@ -173,6 +200,25 @@ public class MQTTService extends Service {
             doClientConnection();
         }
     };
+
+    private void saveMessage(byte[] message, int isSend, int id) {
+        Chat chat = new Chat();
+        chat.setUid(id);
+        chat.setIsSend(isSend);
+        chat.setMessage(message);
+        chat.save();
+        List<Conversation> conversationList = DataSupport.where("uid = ?", id + "").find(Conversation.class);
+        if (conversationList.size() == 0) {
+            Conversation conversation = new Conversation();
+            conversation.setUid(id);
+            conversation.setLastMessage(message);
+            conversation.save();
+        } else {
+            ContentValues values = new ContentValues();
+            values.put("lastMessage", message);
+            DataSupport.updateAll(Conversation.class, values, "uid = ?", id + "");
+        }
+    }
 
     /**
      * 判断网络是否连接
@@ -199,8 +245,8 @@ public class MQTTService extends Service {
 
     public class MyBinder extends Binder {
 
-        public void publishMessage(String msg) {
-            MQTTService.this.publish(msg);
+        public void publishMessage(byte[] msg, int userid) {
+            publish(msg, userid);
         }
 
     }

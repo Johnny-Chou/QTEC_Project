@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/mEtSearch"
+        android:layout_width="342px"
+        android:layout_height="28px"
+        android:layout_marginBottom="10px"
+        android:layout_marginTop="10px"
+        android:background="@mipmap/mes_searchbg"
+        android:gravity="center"
+        android:padding="5px"
+        android:singleLine="true"
+        android:textSize="13px" />
+
+    <include layout="@layout/view_line" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/mFriendsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+
+        <com.im.qtec.widget.QuickIndexBar
+            android:id="@+id/mQuickIndex"
+            android:layout_width="11px"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="6px"
+            android:layout_marginTop="54px"
+            android:layout_marginBottom="18px"/>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

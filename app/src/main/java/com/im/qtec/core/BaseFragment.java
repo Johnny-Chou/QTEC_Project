@@ -40,6 +40,14 @@ public abstract class BaseFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         L.e(toString() + ":onCreate");
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean("hidden",  false)) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .hide(this)
+                        .commit();
+            }
+        }
     }
 
     @Override
@@ -133,6 +141,9 @@ public abstract class BaseFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         L.e(toString() + ":onSaveInstanceState");
+        if (this.isHidden()) {
+            outState.putBoolean("hidden",  true);
+        }
     }
 
     @Override

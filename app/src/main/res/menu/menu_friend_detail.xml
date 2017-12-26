@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_detail"
+        android:orderInCategory="100"
+        android:icon="@mipmap/book_dot"
+        app:showAsAction="ifRoom"
+        android:title="详情" />
+</menu>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar"/>
+
+    <RelativeLayout
+        android:id="@+id/mAccountSafeItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@drawable/selector_item_click">
+        
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/account_safe"/>
+        <ImageView
+            android:src="@mipmap/mes_leftarrow"
+            style="@style/item_arrow_style" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mNewMessageItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@drawable/selector_item_click">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/new_message"/>
+        <ImageView
+            android:src="@mipmap/mes_leftarrow"
+            style="@style/item_arrow_style" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:id="@+id/mGeneralItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@drawable/selector_item_click">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/general"/>
+        <ImageView
+            android:src="@mipmap/mes_leftarrow"
+            style="@style/item_arrow_style" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mAboutAndHelpItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@drawable/selector_item_click">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/about_help"/>
+        <ImageView
+            android:src="@mipmap/mes_leftarrow"
+            style="@style/item_arrow_style" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/mLogoutBtn"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:textSize="16px"
+        android:textColor="@color/logout_red"
+        android:gravity="center"
+        android:background="@color/white"
+        android:text="@string/logout"/>
+
+</LinearLayout>

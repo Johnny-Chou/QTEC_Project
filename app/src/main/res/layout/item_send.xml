@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/mTimeTv"
+        android:layout_width="107px"
+        android:layout_height="21px"
+        android:layout_marginTop="10px"
+        android:textColor="@color/white"
+        android:textSize="12px"
+        android:background="@mipmap/mes_time"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.im.qtec.widget.PortraitView
+            android:id="@+id/mPortraitView"
+            android:layout_width="40px"
+            android:layout_height="40px"
+            android:layout_marginTop="10px"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20px"/>
+
+        <TextView
+            android:id="@+id/mChatTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/mPortraitView"
+            android:layout_marginRight="9px"
+            android:layout_marginLeft="80px"
+            android:textColor="@color/black"
+            android:layout_marginTop="15px"
+            android:textSize="15px"
+            android:background="@drawable/mes_mybox"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

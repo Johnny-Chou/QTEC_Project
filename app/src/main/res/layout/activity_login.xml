@@ -47,7 +47,7 @@
             android:textColorHint="#55c2bfbf"
             android:textSize="18px" />
 
-        <include layout="@layout/view_line" />
+        <include layout="@layout/view_line_margin" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
             android:textColorHint="#55c2bfbf"
             android:textSize="18px" />
 
-        <include layout="@layout/view_line" />
+        <include layout="@layout/view_line_margin" />
 
 
         <Button

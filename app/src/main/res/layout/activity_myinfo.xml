@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar"/>
+
+    <RelativeLayout
+        android:id="@+id/mPortraitItem"
+        android:layout_width="match_parent"
+        android:layout_height="80px"
+        android:background="@drawable/selector_item_click">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/portrait"/>
+
+        <ImageView
+            android:id="@+id/iv_arrow"
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+
+        <com.im.qtec.widget.PortraitView
+            android:id="@+id/mPortraitView"
+            android:layout_width="48px"
+            android:layout_height="48px"
+            android:layout_toLeftOf="@id/iv_arrow"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10px"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@color/white">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/minumber"/>
+
+        <TextView
+            android:id="@+id/mMinumberTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20px"
+            android:textSize="16px"
+            android:textColor="@color/gray_text"/>
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:id="@+id/mPhonenumberItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@drawable/selector_item_click">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/phone_number"/>
+
+        <ImageView
+            android:id="@+id/iv_phone_arrow"
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+
+        <TextView
+            android:id="@+id/mPhonenumberTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/iv_phone_arrow"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8px"
+            android:textSize="16px"
+            android:textColor="@color/gray_text"/>
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:id="@+id/mEmailItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@drawable/selector_item_click">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/email"/>
+
+        <ImageView
+            android:id="@+id/iv_email_arrow"
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+
+        <TextView
+            android:id="@+id/mEmailTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/iv_email_arrow"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8px"
+            android:textSize="16px"
+            android:textColor="@color/gray_text"/>
+    </RelativeLayout>
+
+
+</LinearLayout>

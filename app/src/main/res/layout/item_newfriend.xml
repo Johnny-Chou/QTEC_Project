@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/mFirstLetter"
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:textSize="13px"
+        android:paddingLeft="15px"
+        android:background="@color/fragment_background"
+        android:textColor="@color/black"/>
+    
+    <RelativeLayout
+        android:id="@+id/mContactItem"
+        android:layout_width="match_parent"
+        android:layout_height="68px"
+        android:background="@drawable/selector_item_click">
+
+        <com.im.qtec.widget.PortraitView
+            android:id="@+id/mPortraitView"
+            android:layout_width="48px"
+            android:layout_height="48px"
+            android:scaleType="centerCrop"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20px"/>
+
+        <TextView
+            android:id="@+id/mTvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16px"
+            android:textColor="@color/black"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/mPortraitView"
+            android:layout_marginLeft="16px"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

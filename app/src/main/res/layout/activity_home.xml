@@ -14,7 +14,9 @@
 
 
     <com.im.qtec.widget.TabLayout
+        android:background="@color/white"
         android:id="@+id/mTabLayout"
         android:layout_width="match_parent"
-        android:layout_height="50px"></com.im.qtec.widget.TabLayout>
+        android:layout_height="50px">
+    </com.im.qtec.widget.TabLayout>
 </LinearLayout>

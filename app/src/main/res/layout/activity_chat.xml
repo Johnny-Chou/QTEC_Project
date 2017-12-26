@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:background="@color/chat_background"
+        android:layout_weight="1"></android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/mVoiceBtn"
+            android:layout_width="28px"
+            android:layout_height="28px"
+            android:layout_marginLeft="9px"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/mes_record" />
+
+        <EditText
+            android:id="@+id/mInputEt"
+            android:layout_width="203px"
+            android:layout_height="36px"
+            android:layout_marginLeft="9px"
+            android:textSize="15px"
+            android:background="@mipmap/med_input" />
+
+        <ImageButton
+            android:id="@+id/mFireBtn"
+            android:layout_width="28px"
+            android:layout_height="28px"
+            android:layout_marginLeft="5px"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/mes_fire" />
+
+        <ImageButton
+            android:id="@+id/mEmotionBtn"
+            android:layout_width="28px"
+            android:layout_height="28px"
+            android:layout_marginLeft="5px"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/mes_expression" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5px">
+            <Button
+                android:id="@+id/mSendBtn"
+                android:layout_width="42px"
+                android:layout_height="28px"
+                android:gravity="center"
+                android:background="@color/bar_green"
+                android:text="@string/send"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textSize="16px"/>
+            <ImageButton
+                android:id="@+id/mAddBtn"
+                android:layout_width="28px"
+                android:layout_height="28px"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:visibility="visible"
+                android:src="@mipmap/mes_otherfun" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

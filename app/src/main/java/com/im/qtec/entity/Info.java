@@ -3,11 +3,13 @@ package com.im.qtec.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by zhouyanglei on 2017/11/28.
  */
 
-public class Info implements Parcelable {
+public class Info implements Serializable {
 
 
     /**
@@ -19,33 +21,6 @@ public class Info implements Parcelable {
     private boolean flag;
     private String errCode;
     private ResDataBean resData;
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-    }
-
-    public Info() {
-    }
-
-    protected Info(Parcel in) {
-    }
-
-    public static final Creator<Info> CREATOR = new Creator<Info>() {
-        @Override
-        public Info createFromParcel(Parcel source) {
-            return new Info(source);
-        }
-
-        @Override
-        public Info[] newArray(int size) {
-            return new Info[size];
-        }
-    };
 
     public boolean isFlag() {
         return flag;
@@ -71,7 +46,7 @@ public class Info implements Parcelable {
         this.resData = resData;
     }
 
-    public static class ResDataBean {
+    public static class ResDataBean implements Serializable{
         /**
          * id : 224
          * username : 周阳雷
@@ -108,7 +83,7 @@ public class Info implements Parcelable {
         private int role;
         private String company;
         private String apartment;
-        private int level;
+        private String level;
         private int online;
         private String logo;
 
@@ -232,11 +207,11 @@ public class Info implements Parcelable {
             this.apartment = apartment;
         }
 
-        public int getLevel() {
+        public String getLevel() {
             return level;
         }
 
-        public void setLevel(int level) {
+        public void setLevel(String level) {
             this.level = level;
         }
 

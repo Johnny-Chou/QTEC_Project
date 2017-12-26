@@ -72,22 +72,33 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.publishBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myBinder.publishMessage("CSDN 一口仨馍");
+                myBinder.publishMessage("CSDN 一口仨馍".getBytes(),1);
             }
         });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getMqttMessage(MqttMessage mqttMessage) {
-        Log.i(MQTTService.TAG, "get message:" + mqttMessage.getPayload());
-        Toast.makeText(this, new String(mqttMessage.getPayload()), Toast.LENGTH_SHORT).show();
+    public void getMqttMessage(MessageEvent event) {
+        Log.i(MQTTService.TAG, "get message:" + event.message.getPayload());
+        Toast.makeText(this, new String(event.message.getPayload())+event.topic, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         unbindService(connection);
     }
 
+
+    public static class MessageEvent{
+        String topic;
+
+        MqttMessage message;
+
+        public MessageEvent(String topic, MqttMessage message) {
+            this.topic = topic;
+            this.message = message;
+        }
+    }
 }

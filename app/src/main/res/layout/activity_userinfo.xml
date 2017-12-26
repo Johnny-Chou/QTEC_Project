@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="87px">
+
+        <com.im.qtec.widget.PortraitView
+            android:id="@+id/mPortraitView"
+            android:layout_width="67px"
+            android:layout_height="67px"
+            android:layout_marginLeft="20px"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/mPortraitView"
+            android:layout_marginLeft="20px"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/mTvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textSize="16px"
+                    android:textColor="@color/black"/>
+                <ImageView
+                    android:id="@+id/mIvSex"
+                    android:layout_width="13px"
+                    android:layout_height="13px"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/mTvName"
+                    android:layout_marginLeft="7px"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/mMinumberTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12px"
+                android:textColor="@color/gray_text"
+                android:text="@string/mixin"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="20px">
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:textColor="@color/gray_text"
+            android:text="@string/name"
+            android:layout_marginLeft="25px"/>
+        
+        <TextView
+            android:id="@+id/mFriendNameTv"
+            style="@style/item_text_style"
+            android:layout_toRightOf="@id/name" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50px">
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:textColor="@color/gray_text"
+            android:text="@string/phone_number"
+            android:layout_marginLeft="25px"/>
+
+        <TextView
+            android:id="@+id/mFriendPhoneTv"
+            style="@style/item_text_style"
+            android:layout_toRightOf="@id/phone" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50px">
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:text="@string/email"
+            android:textColor="@color/gray_text"
+            android:layout_marginLeft="25px"/>
+
+        <TextView
+            android:id="@+id/mFriendEmailTv"
+            style="@style/item_text_style"
+            android:layout_toRightOf="@id/email" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50px">
+        <TextView
+            android:id="@+id/department"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:text="@string/department"
+            android:textColor="@color/gray_text"
+            android:layout_marginLeft="25px"/>
+
+        <TextView
+            android:id="@+id/mFriendDepartmentTv"
+            style="@style/item_text_style"
+            android:layout_toRightOf="@id/department" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@color/white">
+        <TextView
+            android:id="@+id/job"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:text="@string/job"
+            android:textColor="@color/gray_text"
+            android:layout_marginLeft="25px"/>
+
+        <TextView
+            android:id="@+id/mFriendJobTv"
+            style="@style/item_text_style"
+            android:layout_toRightOf="@id/job" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/mSendBtn"
+        android:layout_width="320px"
+        android:layout_height="45px"
+        android:layout_marginTop="28px"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/shape_white_bg"
+        android:textSize="18px"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:text="@string/send_msg"/>
+
+    <Button
+        android:id="@+id/mCallBtn"
+        android:layout_width="320px"
+        android:layout_height="45px"
+        android:layout_marginTop="28px"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/shape_green_bg"
+        android:textColor="@color/white"
+        android:textSize="18px"
+        android:gravity="center"
+        android:text="@string/call_secret"/>
+
+</LinearLayout>

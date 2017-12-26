@@ -7,17 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
 import com.im.qtec.R;
 import com.im.qtec.core.BaseFragment;
+import com.im.qtec.utils.SupportMultipleScreensUtil;
 
 import java.util.ArrayList;
 
+
 /**
- * Created by Stay on 27/3/16.
- * Powered by www.stay4it.com
+ * @author zhouyanglei
  */
 public class TabLayout extends LinearLayout implements View.OnClickListener {
     private ArrayList<Tab> tabs;
@@ -61,6 +63,7 @@ public class TabLayout extends LinearLayout implements View.OnClickListener {
                 mTabView.setTag(tabs.get(i));
                 mTabView.setUpData(tabs.get(i));
                 mTabView.setOnClickListener(this);
+                //SupportMultipleScreensUtil.scale(mTabView);
                 addView(mTabView, params);
             }
         } else {
@@ -98,7 +101,7 @@ public class TabLayout extends LinearLayout implements View.OnClickListener {
         void onTabClick(Tab tab);
     }
 
-    public class TabView extends LinearLayout {
+    public class TabView extends RelativeLayout {
         private ImageView mTabImg;
         private TextView mTabLabel;
         private TextView mBadgeLabel;
@@ -121,7 +124,6 @@ public class TabLayout extends LinearLayout implements View.OnClickListener {
 
         private void setUpView() {
             LayoutInflater.from(getContext()).inflate(R.layout.widget_tab_view, this, true);
-            setOrientation(VERTICAL);
             setGravity(Gravity.CENTER);
             mTabImg = findViewById(R.id.mTabImg);
             mTabLabel = findViewById(R.id.mTabLabel);

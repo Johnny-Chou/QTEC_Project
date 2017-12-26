@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/mUserInfoItem"
+        android:layout_width="match_parent"
+        android:layout_height="150px"
+        android:background="@drawable/selector_item_click"
+        android:padding="20px"
+        android:layout_marginTop="10px">
+
+        <TextView
+            android:id="@+id/mTvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16px"
+            android:text="姓名"/>
+        
+        <TextView
+            android:id="@+id/mTvCompany"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14px"
+            android:text="公司"
+            android:layout_below="@id/mTvName"
+            android:layout_marginTop="28px"/>
+
+        <TextView
+            android:id="@+id/mTvDepartment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14px"
+            android:text="部门"
+            android:layout_below="@id/mTvCompany"
+            android:layout_marginTop="3px"/>
+
+        <TextView
+            android:id="@+id/mTvLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14px"
+            android:text="职位"
+            android:layout_below="@id/mTvDepartment"
+            android:layout_marginTop="3px"/>
+        
+        <com.im.qtec.widget.PortraitView
+            android:id="@+id/mIvPortrait"
+            android:layout_width="48px"
+            android:layout_height="48px"
+            android:scaleType="fitCenter"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/ic_launcher"/>
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/mRlKeyManager"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@drawable/selector_item_click"
+        android:clickable="true"
+        android:layout_marginTop="10px">
+        
+        <ImageView
+            android:id="@+id/mIvKey"
+            android:layout_width="24px"
+            android:layout_height="24px"
+            android:scaleType="fitCenter"
+            android:layout_marginLeft="15px"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/my_keyman"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/mIvKey"
+            android:text="@string/key_manager"
+            android:textSize="16px"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10px"/>
+
+        <ImageView
+            android:layout_width="7px"
+            android:layout_height="14px"
+            android:scaleType="fitCenter"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20px"
+            android:src="@mipmap/mes_leftarrow"/>
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"></include>
+
+    <RelativeLayout
+        android:id="@+id/mRlSetting"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@drawable/selector_item_click">
+
+        <ImageView
+            android:id="@+id/mIvSetting"
+            android:layout_width="24px"
+            android:layout_height="24px"
+            android:scaleType="fitCenter"
+            android:layout_marginLeft="15px"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/my_set"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting"
+            android:layout_toRightOf="@id/mIvSetting"
+            android:layout_centerVertical="true"
+            android:textSize="16px"
+            android:layout_marginLeft="10px"/>
+
+        <ImageView
+            android:layout_width="7px"
+            android:layout_height="14px"
+            android:scaleType="fitCenter"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20px"
+            android:src="@mipmap/mes_leftarrow"/>
+    </RelativeLayout>
+
+</LinearLayout>

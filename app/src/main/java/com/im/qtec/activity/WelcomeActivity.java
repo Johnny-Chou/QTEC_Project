@@ -3,7 +3,9 @@ package com.im.qtec.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -11,14 +13,14 @@ import android.widget.ImageView;
 
 import com.blankj.utilcode.util.DeviceUtils;
 import com.im.qtec.R;
-import com.im.qtec.autolayout.AutoLayoutActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.core.AppStatusTracker;
-import com.im.qtec.entity.CheckEntity;
+import com.im.qtec.core.BaseActivity;
+import com.im.qtec.entity.CheckRequestEntity;
 import com.im.qtec.entity.CheckResult;
 import com.im.qtec.utils.HttpEngin;
-import com.im.qtec.utils.L;
 import com.im.qtec.utils.SPUtils;
+import com.im.qtec.utils.SupportMultipleScreensUtil;
 import com.im.qtec.utils.UrlHelper;
 
 import okhttp3.Call;
@@ -33,25 +35,36 @@ import rx.schedulers.Schedulers;
  * @date 2017/11/27
  */
 
-public class WelcomeActivity extends AutoLayoutActivity implements HttpEngin.HttpListener<CheckResult> {
+public class WelcomeActivity extends BaseActivity implements HttpEngin.HttpListener<CheckResult> {
     private ImageView mIvSlogan;
-    private boolean isLogin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        AppStatusTracker.getInstance().setAppStatus(ConstantValues.STATUS_OFFLINE);
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
-        setContentView(R.layout.activity_welcome);
+        super.onCreate(savedInstanceState);
+    }
 
+    @Override
+    protected void setUpContentView() {
+        setContentView(R.layout.activity_welcome);
+    }
+
+    @Override
+    protected void setUpView() {
         mIvSlogan = findViewById(R.id.mIvSlogan);
+    }
+
+    @Override
+    protected void setUpData(Bundle savedInstanceState) {
 
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
         welcomeAnim();
+        super.onResume();
     }
 
     private void welcomeAnim() {
@@ -81,15 +94,14 @@ public class WelcomeActivity extends AutoLayoutActivity implements HttpEngin.Htt
                     @Override
                     public void onStart() {
                         super.onStart();
-                        L.d(System.currentTimeMillis() + "");
                         mIvSlogan.startAnimation(startAnimation);
                     }
 
                     @Override
                     public void onCompleted() {
-                        if (TextUtils.isEmpty(SPUtils.getString(WelcomeActivity.this, ConstantValues.USER_ID, ""))) {
+                        if (SPUtils.getInt(WelcomeActivity.this, ConstantValues.USER_ID, -1) == -1) {
                             startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
-                            AppStatusTracker.getInstance().setAppStatus(ConstantValues.STATUS_OFFLINE);
+                            finish();
                         } else {
                             checkLogin();
                         }
@@ -114,10 +126,14 @@ public class WelcomeActivity extends AutoLayoutActivity implements HttpEngin.Htt
     }
 
     private void checkLogin() {
-        HttpEngin<CheckResult> httpEngin = HttpEngin.getInstance();
-        httpEngin.post(UrlHelper.CHECK_LOGIN_URL,
-                new CheckEntity(SPUtils.getString(this, ConstantValues.USER_ID, ""), DeviceUtils.getAndroidID()),
+       HttpEngin.getInstance().post(UrlHelper.CHECK_LOGIN_URL,
+                new CheckRequestEntity(SPUtils.getInt(this, ConstantValues.USER_ID, -1), DeviceUtils.getAndroidID()),
                 CheckResult.class,this);
+    }
+
+    @Override
+    protected void checkKickout() {
+
     }
 
     @Override

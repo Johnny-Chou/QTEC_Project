@@ -2,27 +2,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/mTabImg"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/mTabImg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:duplicateParentState="true" />
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:duplicateParentState="true" />
 
-        <TextView
-            android:id="@+id/mBadgeLabel"
-            android:background="@drawable/shape_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"/>
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/mBadgeLabel"
+        android:visibility="gone"
+        android:layout_width="15px"
+        android:layout_height="15px"
+        android:layout_toRightOf="@id/mTabImg"
+        android:background="@drawable/shape_badge" />
 
     <TextView
         android:id="@+id/mTabLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/mTabImg"
+        android:layout_marginTop="4px"
         android:duplicateParentState="true"
-        android:textColor="@color/selector_tab_color" />
+        android:textColor="@color/selector_tab_color"
+        android:textSize="10px" />
 </merge>

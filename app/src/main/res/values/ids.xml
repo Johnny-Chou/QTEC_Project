@@ -6,8 +6,14 @@
 
     <item name="toolbar" type="id" />
     <item name="toolbar_title" type="id" />
+    <item name="toolbar_btn" type="id" />
     <item name="swipeRefreshLayout" type="id" />
     <item name="recyclerView" type="id" />
     <item name="pullRecycler" type="id" />
     <item name="viewPager" type="id"/>
+
+    <item name="is_scale_size_tag" type="id" />
+    <item name="is_scale_font_tag" type="id" />
+    <item name="is_top_tag" type="id" />
+    <item name="is_normal_tag" type="id" />
 </resources>

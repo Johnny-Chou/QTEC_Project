@@ -49,6 +49,7 @@ public class HttpEngin<T> {
 
                     @Override
                     public void onResponse(String response, int id) {
+
                         //Type type = ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
                         T t = new Gson().fromJson(response, clazz);
                         mHttpListener.onResponse(t,id);

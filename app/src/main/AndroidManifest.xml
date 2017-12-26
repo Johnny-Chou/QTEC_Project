@@ -5,17 +5,11 @@
     <application
         android:name="com.im.qtec.application.MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo2"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data
-            android:name="design_width"
-            android:value="375"></meta-data>
-        <meta-data
-            android:name="design_height"
-            android:value="667"></meta-data>
+
 
         <activity
             android:name="com.im.qtec.activity.WelcomeActivity"
@@ -29,11 +23,26 @@
             android:name=".activity.HomeActivity"
             android:exported="false"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoginActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.SettingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.UserInfoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait" />
+
 
         <service android:name="org.eclipse.paho.android.service.MqttService"
             android:exported="false"/>
