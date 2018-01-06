@@ -19,14 +19,13 @@ public class CallFragment extends BaseFragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_call,container,false);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.pop_menu,container,false);
         return view;
     }
 
     @Override
     public void setUpView(View view) {
-        PortraitView pv = view.findViewById(R.id.pv);
-        pv.setPortrait(getActivity(),null,"h");
+
     }
 
     @Override

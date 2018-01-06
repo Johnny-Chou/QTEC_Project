@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mOtherMenuLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/mPhotoBtn"
+                    android:layout_width="65px"
+                    android:layout_height="65px"
+                    android:background="@null"
+                    android:src="@mipmap/mes_itempic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5px"
+                    android:text="@string/photo"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/gray_text"
+                    android:textSize="12px" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/mCameraBtn"
+                    android:layout_width="65px"
+                    android:layout_height="65px"
+                    android:background="@null"
+                    android:src="@mipmap/mes_itemphoto" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5px"
+                    android:text="@string/camera"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/gray_text"
+                    android:textSize="12px" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/mCallBtn"
+                    android:layout_width="65px"
+                    android:layout_height="65px"
+                    android:background="@null"
+                    android:src="@mipmap/mes_itemcall" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5px"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/voice_chat"
+                    android:textColor="@color/gray_text"
+                    android:textSize="12px" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/mLocationBtn"
+                    android:layout_width="65px"
+                    android:layout_height="65px"
+                    android:background="@null"
+                    android:src="@mipmap/mes_itemloc" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/mLocationBtn"
+                    android:layout_marginTop="5px"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/location_info"
+                    android:textColor="@color/gray_text"
+                    android:textSize="12px" />
+            </LinearLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/mPersonalBtn"
+                    android:layout_width="65px"
+                    android:layout_height="65px"
+                    android:background="@null"
+                    android:src="@mipmap/mes_friends" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/mPersonalBtn"
+                    android:layout_marginTop="5px"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/personal_info"
+                    android:textColor="@color/gray_text"
+                    android:textSize="12px" />
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0px"
+            android:layout_weight="3"
+            android:layout_height="match_parent"></RelativeLayout>
+    </LinearLayout>
+</merge>

@@ -26,4 +26,5 @@ public class ConstantValues {
     public static final String USER_ID = "user_id";
     public static final String UPDATED_TIME = "updated_time";
     public static final String KEYS = "keys";
+    public static final String KEYBOARD_HEIGHT = "keyboard_height";
 }

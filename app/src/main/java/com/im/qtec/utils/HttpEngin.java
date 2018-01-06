@@ -58,8 +58,8 @@ public class HttpEngin<T> {
     }
 
     public  interface HttpListener<T>{
-        public void onError(Call call, Exception e, int id);
+         void onError(Call call, Exception e, int id);
 
-        public void onResponse(T t, int id);
+         void onResponse(T t, int id);
     }
 }

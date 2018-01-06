@@ -2,9 +2,12 @@ package com.im.qtec.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +17,7 @@ import android.widget.ProgressBar;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.EncryptUtils;
+import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.google.gson.Gson;
 import com.im.qtec.R;
@@ -52,6 +56,26 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void setUpView() {
         mEtUsername = findViewById(R.id.mEtUsername);
         mEtPassword = findViewById(R.id.mEtPassword);
+        mEtPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Rect r = new Rect();
+                getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+                int screenHeight = getWindow().getDecorView().getRootView().getHeight();
+                int softInputHeight = screenHeight - r.bottom;
+                SPUtils.saveInt(LoginActivity.this, ConstantValues.KEYBOARD_HEIGHT,softInputHeight);
+            }
+        });
         mBtLogin = findViewById(R.id.mBtLogin);
         mProgressBar = findViewById(R.id.mProgressBar);
     }

@@ -22,10 +22,10 @@ import com.im.qtec.R;
 import com.im.qtec.activity.ChatActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.core.BaseFragment;
-import com.im.qtec.db.Chat;
 import com.im.qtec.db.Contact;
 import com.im.qtec.db.Conversation;
 import com.im.qtec.event.MessageEvent;
+import com.im.qtec.utils.EmoParser;
 import com.im.qtec.utils.MessageUtils;
 import com.im.qtec.utils.RecycleViewDivider;
 import com.im.qtec.utils.SupportMultipleScreensUtil;
@@ -35,7 +35,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
-import org.litepal.util.Const;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -180,7 +179,7 @@ public class ConversationFragment extends BaseFragment {
                     mTvName.setText(contact.getUsername());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM月dd日 HH:mm:ss", Locale.getDefault());
                     mTvTime.setText(TimeUtils.millis2String((long) MessageUtils.getTime(conversation.getLastMessage()) * 1000, simpleDateFormat));
-                    mTvContent.setText(MessageUtils.getPlainMessage(conversation.getLastMessage()));
+                    mTvContent.setText(EmoParser.parseEmo(getActivity(),MessageUtils.getPlainMessage(conversation.getLastMessage()),20));
                     mConversationItem.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

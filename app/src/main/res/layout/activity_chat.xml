@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,72 +11,103 @@
         android:id="@+id/mRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:background="@color/chat_background"
-        android:layout_weight="1"></android.support.v7.widget.RecyclerView>
+        android:layout_weight="1"
+        android:background="@color/chat_background"></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
+        android:id="@+id/mEditorContainer"
         android:layout_width="match_parent"
         android:layout_height="50px"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/mVoiceBtn"
-            android:layout_width="28px"
-            android:layout_height="28px"
-            android:layout_marginLeft="9px"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/mes_record" />
+        <LinearLayout
+            android:id="@+id/mEditorBar"
+            android:layout_width="match_parent"
+            android:layout_height="50px"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/mInputEt"
-            android:layout_width="203px"
-            android:layout_height="36px"
-            android:layout_marginLeft="9px"
-            android:textSize="15px"
-            android:background="@mipmap/med_input" />
-
-        <ImageButton
-            android:id="@+id/mFireBtn"
-            android:layout_width="28px"
-            android:layout_height="28px"
-            android:layout_marginLeft="5px"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/mes_fire" />
-
-        <ImageButton
-            android:id="@+id/mEmotionBtn"
-            android:layout_width="28px"
-            android:layout_height="28px"
-            android:layout_marginLeft="5px"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/mes_expression" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5px">
-            <Button
-                android:id="@+id/mSendBtn"
-                android:layout_width="42px"
-                android:layout_height="28px"
-                android:gravity="center"
-                android:background="@color/bar_green"
-                android:text="@string/send"
-                android:visibility="gone"
-                android:textColor="@color/white"
-                android:textSize="16px"/>
             <ImageButton
-                android:id="@+id/mAddBtn"
+                android:id="@+id/mVoiceBtn"
                 android:layout_width="28px"
                 android:layout_height="28px"
+                android:layout_marginLeft="9px"
                 android:background="@null"
                 android:scaleType="fitCenter"
-                android:visibility="visible"
-                android:src="@mipmap/mes_otherfun" />
+                android:src="@mipmap/mes_record" />
+
+            <EditText
+                android:id="@+id/mInputEt"
+                android:layout_width="203px"
+                android:layout_height="36px"
+                android:layout_marginLeft="9px"
+                android:background="@mipmap/med_input"
+                android:textSize="15px" />
+
+            <ImageButton
+                android:id="@+id/mFireBtn"
+                android:layout_width="28px"
+                android:layout_height="28px"
+                android:layout_marginLeft="5px"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/mes_fire" />
+
+            <ImageButton
+                android:id="@+id/mEmotionBtn"
+                android:layout_width="28px"
+                android:layout_height="28px"
+                android:layout_marginLeft="5px"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/mes_expression" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5px">
+
+                <Button
+                    android:id="@+id/mSendBtn"
+                    android:layout_width="42px"
+                    android:layout_height="28px"
+                    android:background="@color/bar_green"
+                    android:gravity="center"
+                    android:text="@string/send"
+                    android:textColor="@color/white"
+                    android:textSize="16px"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/mAddBtn"
+                    android:layout_width="28px"
+                    android:layout_height="28px"
+                    android:background="@null"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/mes_otherfun"
+                    android:visibility="visible" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <include layout="@layout/view_line" />
+
+        <RelativeLayout
+            android:id="@+id/mMenuContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <com.im.qtec.widget.EditorMenuView
+                android:id="@+id/mEditorMenuView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.im.qtec.widget.EmoView
+                android:id="@+id/mEmoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </RelativeLayout>
+
     </LinearLayout>
 </LinearLayout>
