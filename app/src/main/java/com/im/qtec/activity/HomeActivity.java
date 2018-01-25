@@ -19,6 +19,7 @@ import com.im.qtec.fragment.CallFragment;
 import com.im.qtec.fragment.ContactsFragment;
 import com.im.qtec.fragment.ConversationFragment;
 import com.im.qtec.fragment.MineFragment;
+import com.im.qtec.fragment.RecentCallFragment;
 import com.im.qtec.service.MQTTService;
 import com.im.qtec.utils.HttpEngin;
 import com.im.qtec.utils.SPUtils;
@@ -65,7 +66,7 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
         ArrayList<TabLayout.Tab> tabs = new ArrayList<>();
         tabs.add(new TabLayout.Tab(R.drawable.selector_message,R.string.message,R.menu.menu_conversation,ConversationFragment.class));
         tabs.add(new TabLayout.Tab(R.drawable.selector_contacts,R.string.contacts,-1,ContactsFragment.class));
-        tabs.add(new TabLayout.Tab(R.drawable.selector_call,R.string.call,-1,CallFragment.class));
+        tabs.add(new TabLayout.Tab(R.drawable.selector_call,R.string.call,-1,RecentCallFragment.class));
         tabs.add(new TabLayout.Tab(R.drawable.selector_mine,R.string.mine,-1,MineFragment.class));
         mTabLayout.setUpData(tabs,this);
         mTabLayout.setCurrentTab(0);

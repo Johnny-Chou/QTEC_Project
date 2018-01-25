@@ -32,6 +32,8 @@ public class MyApplication extends LitePalApplication {
 
         OkHttpUtils.initClient(okHttpClient);
         Utils.init(this);
+        //加载pjsua2
+        System.loadLibrary("pjsua2");
 
     }
 }

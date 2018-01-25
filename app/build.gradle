@@ -10,6 +10,9 @@ android {
         versionName "1.0"
         android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            moduleName "libpjsua2"
+        }
     }
     buildTypes {
         release {
@@ -46,6 +49,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
     implementation files('libs/pinyin4j-2.5.0.jar')
     compile 'com.android.support:recyclerview-v7:27.0.+'
+    compile 'com.android.support:design:27.0.+'
     compile 'org.litepal.android:core:1.6.1'
     implementation files('libs/bcprov-jdk15on-158.jar')
     implementation files('libs/bcpkix-jdk15on-158.jar')
