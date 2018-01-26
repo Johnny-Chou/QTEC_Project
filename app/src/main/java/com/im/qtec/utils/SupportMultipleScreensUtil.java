@@ -27,10 +27,14 @@ public class SupportMultipleScreensUtil {
     }
 
     public static void init(Context context) {
+        int widthPixels = getWidthPixels(context);
+        scale = (float)widthPixels / BASE_SCREEN_WIDTH_FLOAT;
+    }
+
+    public static int getWidthPixels(Context context) {
         Resources resources=context.getResources();
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-        int widthPixels = displayMetrics.widthPixels;
-        scale = (float)widthPixels / BASE_SCREEN_WIDTH_FLOAT;
+        return displayMetrics.widthPixels;
     }
 
 
@@ -59,6 +63,7 @@ public class SupportMultipleScreensUtil {
 
 
     private static void scaleViewGroup(ViewGroup viewGroup) {
+        scaleView(viewGroup);
         for (int i = 0; i < viewGroup.getChildCount(); ++i) {
             View view = viewGroup.getChildAt(i);
             if (view instanceof Toolbar){
@@ -77,13 +82,6 @@ public class SupportMultipleScreensUtil {
     }
 
 
-    /**
-     * 原创作者:
-     * 谷哥的小弟
-     *
-     * 博客地址:
-     * http://blog.csdn.net/lfdfhl
-     */
     public static void scaleViewSize(View view) {
         if (null != view) {
             int paddingLeft = getScaleValue(view.getPaddingLeft());
@@ -115,8 +113,8 @@ public class SupportMultipleScreensUtil {
                     marginLayoutParams.bottomMargin = bottomMargin;
                     marginLayoutParams.rightMargin = rightMargin;
                 }
+                view.setLayoutParams(layoutParams);
             }
-            view.setLayoutParams(layoutParams);
         }
     }
 

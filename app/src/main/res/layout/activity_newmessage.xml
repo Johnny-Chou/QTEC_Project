@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar"/>
+
+    <RelativeLayout
+        android:id="@+id/mReceiveMessageNotificationItem"
+        android:layout_marginTop="10px"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/receive_message_notification"/>
+
+        <ImageView
+            android:id="@+id/mReceiveMessageToggle"
+            android:src="@drawable/selector_toggle"
+            style="@style/style_toggle" />
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:id="@+id/mReceiveCallNotificationItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/receive_call_notification"/>
+
+        <ImageView
+            android:id="@+id/mReceiveCallToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+
+    <include layout="@layout/view_line"/>
+
+    <RelativeLayout
+        android:id="@+id/mCallRingbellItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/call_ringbell"/>
+
+        <ImageView
+            android:id="@+id/mRingbellToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mShowNotificationDetailItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="20px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/show_detail"/>
+
+        <ImageView
+            android:id="@+id/mShowDetailToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:paddingLeft="20px"
+        android:paddingRight="20px"
+        android:textSize="12px"
+        android:background="@android:color/transparent"
+        android:textColor="@color/gray_text"
+        android:gravity="center_vertical"
+        android:text="@string/long_detail"/>
+
+    <RelativeLayout
+        android:id="@+id/mVoiceItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="20px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/voice"/>
+
+        <ImageView
+            android:id="@+id/mVoiceToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+    <include layout="@layout/view_line"/>
+    <RelativeLayout
+        android:id="@+id/mVibrationItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="20px"
+        android:background="@color/white">
+
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/vibration"/>
+
+        <ImageView
+            android:id="@+id/mVibrationToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+
+</LinearLayout>

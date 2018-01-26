@@ -16,4 +16,5 @@
     <item name="is_scale_font_tag" type="id" />
     <item name="is_top_tag" type="id" />
     <item name="is_normal_tag" type="id" />
+    <item name="is_photo_tag" type="id" />
 </resources>

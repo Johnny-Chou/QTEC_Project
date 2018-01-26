@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="130px"
+        android:layout_height="130px"
+        android:layout_marginTop="30px"
+        android:src="@mipmap/logo2"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10px"
+        android:textSize="16px"/>
+    
+    <RelativeLayout
+        android:id="@+id/mVersionInfoItem"
+        android:background="@drawable/selector_item_click"
+        android:layout_marginTop="20px"
+        android:layout_width="match_parent"
+        android:layout_height="50px">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/version_info"/>
+
+        <ImageView
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+    </RelativeLayout>
+    <include layout="@layout/view_line"/>
+    <RelativeLayout
+        android:id="@+id/mAdviceFeedback"
+        android:background="@drawable/selector_item_click"
+        android:layout_marginTop="20px"
+        android:layout_width="match_parent"
+        android:layout_height="50px">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/advice_feedback"/>
+
+        <ImageView
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+    </RelativeLayout>
+</LinearLayout>

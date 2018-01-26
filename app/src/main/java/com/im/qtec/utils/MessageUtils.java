@@ -86,6 +86,11 @@ public class MessageUtils {
         return message[26];
     }
 
+
+    public static byte getVoiceLength(byte[] message) {
+        return message[32];
+    }
+
     public static boolean isDelete(byte[] message) {
         return message[27] == 0 ? false : true;
     }
@@ -98,8 +103,8 @@ public class MessageUtils {
         return bytesToInt(timestamp, 0);
     }*/
 
-    public static String getPlainMessage(byte[] message) {
-        byte[] plain = new byte[0];
+    public static String getMessage(byte[] message) {
+        byte[] plain = new byte[]{0};
         try {
             plain = EncryptUtils.decryptAES(getMessageContent(message), getMessageKey(message));
             //plain = getMessageContent(message);
@@ -132,6 +137,59 @@ public class MessageUtils {
                     message[i] = isDelete;
                 } else if (i < 32) {
                     message[i] = time[i - 28];
+                }else if (i >= headerLength) {
+                    message[i] = encryptContent[i - headerLength];
+                }
+            }
+            return message;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new byte[0];
+    }
+
+    public static byte[] setMessageContent(byte[] message,  byte[] messageContent) {
+        char headerLength = getHeaderLength(message);
+        byte[] newMessage = new byte[headerLength + messageContent.length];
+        try {
+            for (int i = 0; i < headerLength; i++) {
+                newMessage[i] = message[i];
+            }
+            for (int i = headerLength; i < newMessage.length; i++) {
+                newMessage[i] = messageContent[i - headerLength];
+            }
+            return newMessage;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static byte[] getEncryptedMessage(char headerLength, byte[] key, int senderid, int receiverid, byte messageType, byte isDelete, int timestamp,int voiceLength, byte[] messageContent) {
+        byte[] header = charToBytes(headerLength);
+        byte[] sender = intToBytes(senderid);
+        byte[] receiver = intToBytes(receiverid);
+        byte[] time = intToBytes(timestamp);
+        try {
+            byte[] encryptContent = EncryptUtils.encryptAES(messageContent, key);
+            byte[] message = new byte[headerLength + encryptContent.length];
+            for (int i = 0; i < message.length; i++) {
+                if (i < 2) {
+                    message[i] = header[i];
+                } else if (i < 18) {
+                    message[i] = key[i - 2];
+                } else if (i < 22) {
+                    message[i] = sender[i - 18];
+                } else if (i < 26) {
+                    message[i] = receiver[i - 22];
+                } else if (i < 27) {
+                    message[i] = messageType;
+                } else if (i < 28) {
+                    message[i] = isDelete;
+                } else if (i < 32) {
+                    message[i] = time[i - 28];
+                } else if (messageType == 3 && i == 32) {
+                    message[i] = (byte) voiceLength;
                 } else if (i >= headerLength) {
                     message[i] = encryptContent[i - headerLength];
                 }
@@ -149,5 +207,14 @@ public class MessageUtils {
         value = (char) ((src[offset] & 0xFF)
                 | ((src[offset + 1] & 0xFF) << 8));
         return value;
+    }
+
+    public static String getPath(byte[] message) {
+        char headerLength = getHeaderLength(message);
+        byte[] newMessage = new byte[message.length - headerLength];
+        for (int i = headerLength; i < message.length; i++) {
+            newMessage[i - headerLength] = message[i];
+        }
+        return new String(newMessage);
     }
 }

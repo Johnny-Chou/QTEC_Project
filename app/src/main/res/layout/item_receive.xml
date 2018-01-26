@@ -8,34 +8,65 @@
         android:id="@+id/mTimeTv"
         android:layout_width="107px"
         android:layout_height="21px"
-        android:layout_marginTop="10px"
-        android:textColor="@color/white"
-        android:textSize="12px"
-        android:background="@mipmap/mes_time"
         android:layout_gravity="center_horizontal"
-        android:gravity="center"/>
+        android:layout_marginTop="10px"
+        android:background="@mipmap/mes_time"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="12px" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginRight="80px">
+
         <com.im.qtec.widget.PortraitView
             android:id="@+id/mPortraitView"
             android:layout_width="40px"
             android:layout_height="40px"
-            android:layout_marginTop="10px"
-            android:layout_marginLeft="20px"/>
-        
-        <TextView
-            android:id="@+id/mChatTv"
+            android:layout_marginLeft="20px"
+            android:layout_marginTop="10px" />
+
+        <FrameLayout
+            android:id="@+id/mMessageContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/mPortraitView"
             android:layout_marginLeft="9px"
-            android:layout_marginRight="80px"
-            android:textColor="@color/black"
-            android:textSize="15px"
             android:layout_marginTop="15px"
-            android:background="@drawable/mes_oppobox"/>
+            android:layout_toRightOf="@id/mPortraitView"
+            android:background="@drawable/mes_oppobox">
+
+            <TextView
+                android:id="@+id/mChatTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15px" />
+
+            <ImageView
+                android:id="@+id/mPictureView"
+                android:layout_width="75px"
+                android:layout_height="145px"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/mAnimView"
+                android:layout_width="20px"
+                android:layout_height="20px"
+                android:layout_gravity="center_vertical|left"
+                android:background="@mipmap/mes_oppovoiceplay3"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/mTimeLengthView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15px"
+            android:layout_toRightOf="@id/mMessageContainer"
+            android:layout_marginLeft="10px"
+            android:textColor="@color/gray_text"
+            android:textSize="10px"/>
     </RelativeLayout>
 
 </LinearLayout>

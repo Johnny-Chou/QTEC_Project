@@ -42,7 +42,26 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".activity.PhotoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AccountSafetyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ModifyPasswordActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.NewMessageActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.GeneralActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService"
             android:exported="false"/>
@@ -54,4 +73,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 </manifest>

@@ -140,6 +140,12 @@ public class ConversationFragment extends BaseFragment {
 
         @Override
         public int getItemCount() {
+//            for (int i = 0; i < conversationList.size(); i++) {
+//                List<Contact> contacts = DataSupport.where("uid = ?", conversationList.get(i).getUid() + "").find(Contact.class);
+//                if (contacts.size() == 0) {
+//                    conversationList.remove(i);
+//                }
+//            }
             return conversationList.size();
         }
 
@@ -179,12 +185,16 @@ public class ConversationFragment extends BaseFragment {
                     mTvName.setText(contact.getUsername());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM月dd日 HH:mm:ss", Locale.getDefault());
                     mTvTime.setText(TimeUtils.millis2String((long) MessageUtils.getTime(conversation.getLastMessage()) * 1000, simpleDateFormat));
-                    mTvContent.setText(EmoParser.parseEmo(getActivity(),MessageUtils.getPlainMessage(conversation.getLastMessage()),20));
+                    if (MessageUtils.getMessageType(conversation.getLastMessage()) == 3) {
+                        mTvContent.setText("[语音]");
+                    } else {
+                        mTvContent.setText(EmoParser.parseEmo(getActivity(), MessageUtils.getMessage(conversation.getLastMessage()), 20));
+                    }
                     mConversationItem.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Intent intent = new Intent(getActivity(), ChatActivity.class);
-                            intent.putExtra(ConstantValues.CONTACT_INFO,contact);
+                            intent.putExtra(ConstantValues.CONTACT_INFO, contact);
                             startActivity(intent);
                         }
                     });
@@ -202,6 +212,7 @@ public class ConversationFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void getMqttMessage(MessageEvent event) {
         conversationList = DataSupport.findAll(Conversation.class);
+        sortConversationList();
         conversationAdapter.notifyDataSetChanged();
     }
 }

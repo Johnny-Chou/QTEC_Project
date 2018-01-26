@@ -60,6 +60,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
                 setUpData(savedInstanceState);
                 break;
         }
+        scaleView();
+    }
+
+    private void scaleView() {
         getWindow().setStatusBarColor(getResources().getColor(R.color.bar_green));
         View rootView = findViewById(android.R.id.content);
         SupportMultipleScreensUtil.init(getApplication());

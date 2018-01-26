@@ -110,6 +110,7 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
                 reLogin();
                 break;
             case ConstantValues.ACTION_LOGOUT:
+                logout();
                 break;
             case ConstantValues.ACTION_RESTART_APP:
                 protectApp();
@@ -119,9 +120,16 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
         }
     }
 
+    private void logout() {
+        AppStatusTracker.getInstance().setAppStatus(ConstantValues.STATUS_LOGOUT);
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void reLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra(ConstantValues.KEY_HOME_ACTION, ConstantValues.ACTION_KICK_OUT);
+        //intent.putExtra(ConstantValues.KEY_HOME_ACTION, ConstantValues.ACTION_KICK_OUT);
         AppStatusTracker.getInstance().setAppStatus(ConstantValues.STATUS_OFFLINE);
         startActivity(intent);
         finish();

@@ -9,14 +9,18 @@ import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.DeviceUtils;
 import com.im.qtec.activity.MainActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.db.Chat;
+import com.im.qtec.db.Contact;
 import com.im.qtec.db.Conversation;
 import com.im.qtec.event.MessageEvent;
+import com.im.qtec.utils.HttpEngin;
+import com.im.qtec.utils.MessageUtils;
 import com.im.qtec.utils.SPUtils;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -32,28 +36,25 @@ import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
+import java.util.UUID;
 
-/**
- * MQTT长连接服务
- *
- * @author 一口仨馍 联系方式 : yikousamo@gmail.com
- * @version 创建时间：2016/9/16 22:06
- */
+import okhttp3.Call;
+
 public class MQTTService extends Service {
+    private static final int CHAT_TYPE_MESSAGE = 1;
+    private static final int CHAT_TYPE_PICTURE = 2;
+    private static final int CHAT_TYPE_VOICE = 3;
 
     public static final String TAG = MQTTService.class.getSimpleName();
 
     private static MqttAndroidClient client;
     private MqttConnectOptions conOpt;
-
-    //    private String host = "tcp://10.0.2.2:61613";
     private String host = "tcp://192.168.91.137:1883";
     private String userName;
     private String passWord = "password";
     private static String myTopic;
     private String clientId = DeviceUtils.getAndroidID();
     private int myid;
-    private boolean isSubscribed;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -72,6 +73,23 @@ public class MQTTService extends Service {
             client.publish(topic, msg, qos.intValue(), retained.booleanValue());
             saveMessage(msg, 1, userid);
             EventBus.getDefault().post(new MessageEvent());
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void publish(byte[] yourMsg, int userid, byte[] myMsg) {
+        String topic = "single/" + userid + "/" + myid;
+        Integer qos = 0;
+        Boolean retained = false;
+        try {
+            if (yourMsg != null) {
+                client.publish(topic, yourMsg, qos.intValue(), retained.booleanValue());
+            }
+            if (myMsg != null) {
+                saveMessage(myMsg, 1, userid);
+                EventBus.getDefault().post(new MessageEvent());
+            }
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -170,6 +188,10 @@ public class MQTTService extends Service {
         }
     };
 
+    private String generateFileName() {
+        return UUID.randomUUID().toString() + ".amr";
+    }
+
     // MQTT监听并且接受消息
     private MqttCallback mqttCallback = new MqttCallback() {
 
@@ -179,11 +201,37 @@ public class MQTTService extends Service {
 //            String str1 = new String(message.getPayload());
 //            MqttMessage msg = new MqttMessage();
 //            msg.setMessage(str1);
-            int lastIndex = topic.lastIndexOf("/");
-            String userid = topic.substring(lastIndex + 1);
-            int id = Integer.valueOf(userid);
-            saveMessage(message.getPayload(), 0, id);
-            EventBus.getDefault().post(new MessageEvent());
+            if (!TextUtils.isEmpty(topic) && topic.contains("/")) {
+                int lastIndex = topic.lastIndexOf("/");
+                String userid = topic.substring(lastIndex + 1);
+                final int uid = Integer.valueOf(userid);
+
+                final byte[] payload = message.getPayload();
+                if (MessageUtils.getMessageType(payload) == CHAT_TYPE_VOICE) {
+                    String voiceUrl = MessageUtils.getMessage(payload);
+                    HttpEngin.getInstance().getFile(voiceUrl, getFilesDir().getAbsolutePath(), generateFileName(), new HttpEngin.FileLoadListener<String>() {
+                        @Override
+                        public void inProgress(float progress, long total, int id) {
+
+                        }
+
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+
+                        }
+
+                        @Override
+                        public void onResponse(String s, int id) {
+                            MessageUtils.setMessageContent(payload, s.getBytes());
+                            saveMessage(payload, 0, uid);
+                            EventBus.getDefault().post(new MessageEvent());
+                        }
+                    });
+                } else {
+                    saveMessage(payload, 0, uid);
+                    EventBus.getDefault().post(new MessageEvent());
+                }
+            }
 //            String str2 = topic + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
 //            Log.i(TAG, "messageArrived:" + str1);
 //            Log.i(TAG, str2);
@@ -202,21 +250,24 @@ public class MQTTService extends Service {
     };
 
     private void saveMessage(byte[] message, int isSend, int id) {
-        Chat chat = new Chat();
-        chat.setUid(id);
-        chat.setIsSend(isSend);
-        chat.setMessage(message);
-        chat.save();
-        List<Conversation> conversationList = DataSupport.where("uid = ?", id + "").find(Conversation.class);
-        if (conversationList.size() == 0) {
-            Conversation conversation = new Conversation();
-            conversation.setUid(id);
-            conversation.setLastMessage(message);
-            conversation.save();
-        } else {
-            ContentValues values = new ContentValues();
-            values.put("lastMessage", message);
-            DataSupport.updateAll(Conversation.class, values, "uid = ?", id + "");
+        List<Contact> contacts = DataSupport.where("uid = ?", id + "").find(Contact.class);
+        if (contacts.size() != 0) {
+            Chat chat = new Chat();
+            chat.setUid(id);
+            chat.setIsSend(isSend);
+            chat.setMessage(message);
+            chat.save();
+            List<Conversation> conversationList = DataSupport.where("uid = ?", id + "").find(Conversation.class);
+            if (conversationList.size() == 0) {
+                Conversation conversation = new Conversation();
+                conversation.setUid(id);
+                conversation.setLastMessage(message);
+                conversation.save();
+            } else {
+                ContentValues values = new ContentValues();
+                values.put("lastMessage", message);
+                DataSupport.updateAll(Conversation.class, values, "uid = ?", id + "");
+            }
         }
     }
 
@@ -247,6 +298,10 @@ public class MQTTService extends Service {
 
         public void publishMessage(byte[] msg, int userid) {
             publish(msg, userid);
+        }
+
+        public void publishVoice(byte[] yourMsg, int userid, byte[] myMsg) {
+            publish(yourMsg, userid, myMsg);
         }
 
     }

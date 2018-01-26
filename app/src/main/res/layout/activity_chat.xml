@@ -34,15 +34,31 @@
                 android:layout_marginLeft="9px"
                 android:background="@null"
                 android:scaleType="fitCenter"
-                android:src="@mipmap/mes_record" />
+                android:src="@drawable/selector_btn_voice" />
 
-            <EditText
-                android:id="@+id/mInputEt"
+            <FrameLayout
                 android:layout_width="203px"
                 android:layout_height="36px"
-                android:layout_marginLeft="9px"
-                android:background="@mipmap/med_input"
-                android:textSize="15px" />
+                android:layout_marginLeft="9px">
+
+                <EditText
+                    android:id="@+id/mInputEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@mipmap/med_input"
+                    android:textSize="15px" />
+
+                <com.im.qtec.widget.AudioRecorderButton
+                    android:id="@+id/mAudioRecordBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/btn_recorder_normal"
+                    android:gravity="center"
+                    android:text="@string/str_recorder_normal"
+                    android:visibility="gone"
+                    android:textSize="15px"/>
+            </FrameLayout>
+
 
             <ImageButton
                 android:id="@+id/mFireBtn"
@@ -106,7 +122,7 @@
             <com.im.qtec.widget.EmoView
                 android:id="@+id/mEmoView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </RelativeLayout>
 
     </LinearLayout>

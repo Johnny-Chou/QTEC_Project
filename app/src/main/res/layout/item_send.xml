@@ -17,7 +17,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="80px">
 
         <com.im.qtec.widget.PortraitView
             android:id="@+id/mPortraitView"
@@ -27,17 +28,46 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="20px"/>
 
-        <TextView
-            android:id="@+id/mChatTv"
+        <FrameLayout
+            android:id="@+id/mMessageContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/mPortraitView"
             android:layout_marginRight="9px"
-            android:layout_marginLeft="80px"
-            android:textColor="@color/black"
             android:layout_marginTop="15px"
-            android:textSize="15px"
-            android:background="@drawable/mes_mybox"/>
+            android:layout_toLeftOf="@id/mPortraitView"
+            android:background="@drawable/mes_mybox">
+
+            <TextView
+                android:id="@+id/mChatTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15px" />
+
+            <ImageView
+                android:id="@+id/mPictureView"
+                android:layout_width="75px"
+                android:layout_height="145px"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/mAnimView"
+                android:layout_width="20px"
+                android:layout_height="20px"
+                android:layout_gravity="center_vertical|right"
+                android:background="@mipmap/mes_myvoiceplay3"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/mTimeLengthView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15px"
+            android:layout_toLeftOf="@id/mMessageContainer"
+            android:layout_marginRight="10px"
+            android:textColor="@color/gray_text"
+            android:textSize="10px"/>
 
     </RelativeLayout>
 

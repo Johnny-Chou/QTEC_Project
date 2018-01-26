@@ -37,4 +37,26 @@
     <string name="voice_chat">语音聊天</string>
     <string name="location_info">位置信息</string>
     <string name="personal_info">个人名片</string>
+    <string name="select_photo">选择照片</string>
+    <string name="origin_picture">原图</string>
+    <string name="send_pic">发送</string>
+    <string name="modify_password">修改密码</string>
+    <string name="origin_password">原密码</string>
+    <string name="new_password">新密码</string>
+    <string name="try_again">再输入一次</string>
+    <string name="receive_message_notification">接收新消息通知</string>
+    <string name="receive_call_notification">接收密话语音邀请通知</string>
+    <string name="call_ringbell">密话语音铃声</string>
+    <string name="show_detail">通知显示消息详情</string>
+    <string name="long_detail">关闭后，收到普通聊天消息时，通知提示将不显示发信人和内容摘要。</string>
+    <string name="voice">声音</string>
+    <string name="vibration">振动</string>
+    <string name="show_if_read">显示已读未读</string>
+    <string name="if_read_hint">开启后显示已读未读提示</string>
+    <string name="clear_chatrecord">清空聊天信息</string>
+    <string name="version_info">版本信息</string>
+    <string name="advice_feedback">意见反馈</string>
+    <string name="str_recorder_normal">按住说话</string>
+    <string name="str_recorder_recording">松开结束</string>
+    <string name="str_recorder_want_cancel">松开手指，取消发送</string>
 </resources>

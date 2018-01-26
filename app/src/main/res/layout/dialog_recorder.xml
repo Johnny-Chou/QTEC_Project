@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="180px"
+    android:layout_height="180px"
+    android:background="@drawable/dialog_loading_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20px" >
+
+    <RelativeLayout
+        android:layout_width="100px"
+        android:layout_height="76px">
+        <ImageView
+            android:id="@+id/id_recorder_dialog_cancle"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:src="@mipmap/cancel"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/id_recorder_dialog_icon"
+            android:layout_width="50px"
+            android:layout_height="76px"
+            android:src="@mipmap/recorder"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/id_recorder_dialog_voice"
+            android:layout_alignParentRight="true"
+            android:layout_width="50px"
+            android:layout_height="76px"
+            android:src="@mipmap/v1" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/id_recorder_dialog_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20px"
+        android:textSize="15px"
+        android:text="手指上滑取消发送"
+        android:textColor="#ffffff" />
+
+</LinearLayout>

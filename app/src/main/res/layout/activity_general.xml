@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/widget_toolbar"/>
+
+    <RelativeLayout
+        android:id="@+id/mShowIfReadItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@color/white">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/show_if_read"/>
+
+        <ImageView
+            android:id="@+id/mIfReadToggle"
+            style="@style/style_toggle"
+            android:src="@drawable/selector_toggle"/>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30px"
+        android:paddingRight="20px"
+        android:paddingLeft="20px"
+        android:textColor="@color/gray_text"
+        android:gravity="center_vertical"
+        android:textSize="12px"
+        android:text="@string/if_read_hint"/>
+
+    <RelativeLayout
+        android:id="@+id/mStorageSpaceItem"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:layout_marginTop="10px"
+        android:background="@drawable/selector_item_click">
+        <TextView
+            style="@style/item_text_style"
+            android:text="@string/show_if_read"/>
+
+        <ImageView
+            style="@style/item_arrow_style"
+            android:src="@mipmap/mes_leftarrow"/>
+    </RelativeLayout>
+    
+    <TextView
+        android:id="@+id/mClearRecordBtn"
+        android:layout_width="match_parent"
+        android:layout_height="50px"
+        android:text="@string/clear_chatrecord"
+        android:gravity="center"
+        android:background="@color/white"
+        android:layout_marginTop="10px"
+        android:textSize="16px"/>
+
+</LinearLayout>

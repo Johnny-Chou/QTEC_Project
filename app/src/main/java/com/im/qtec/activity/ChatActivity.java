@@ -1,14 +1,10 @@
 package com.im.qtec.activity;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Binder;
+import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,19 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -40,8 +34,10 @@ import com.google.gson.Gson;
 import com.im.qtec.R;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.core.BaseActivity;
+import com.im.qtec.core.MediaManager;
 import com.im.qtec.db.Chat;
 import com.im.qtec.db.Contact;
+import com.im.qtec.entity.FileUploadResultEntity;
 import com.im.qtec.entity.Info;
 import com.im.qtec.entity.KeyRequestEntity;
 import com.im.qtec.entity.KeyResultEntity;
@@ -54,6 +50,8 @@ import com.im.qtec.utils.MessageUtils;
 import com.im.qtec.utils.SPUtils;
 import com.im.qtec.utils.SupportMultipleScreensUtil;
 import com.im.qtec.utils.UrlHelper;
+import com.im.qtec.widget.AudioRecorderButton;
+import com.im.qtec.widget.EditorMenuView;
 import com.im.qtec.widget.EmoNormalGrid;
 import com.im.qtec.widget.EmoView;
 import com.im.qtec.widget.PortraitView;
@@ -63,6 +61,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -86,7 +85,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     @Bind(R.id.mEditorBar)
     LinearLayout mEditorBar;
     @Bind(R.id.mEditorMenuView)
-    LinearLayout mEditorMenuView;
+    EditorMenuView mEditorMenuView;
     @Bind(R.id.mEmoView)
     EmoView mEmoView;
     @Bind(R.id.mMenuContainer)
@@ -95,6 +94,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     ImageButton mVoiceBtn;
     @Bind(R.id.mInputEt)
     EditText mInputEt;
+    @Bind(R.id.mAudioRecordBtn)
+    AudioRecorderButton mAudioRecordBtn;
     @Bind(R.id.mFireBtn)
     ImageButton mFireBtn;
     @Bind(R.id.mEmotionBtn)
@@ -103,14 +104,25 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     Button mSendBtn;
     @Bind(R.id.mAddBtn)
     ImageButton mAddBtn;
+    private View mAnimViewLabel;
     private Contact contact;
     private List<Chat> chatList;
     private ChatAdapter chatAdapter;
     private Info userinfo;
     private MQTTService.MyBinder myBinder;
-    private static final int SEND_ITEM = 1;
     private static final int RECEIVE_ITEM = 0;
+    //    private static final int RECEIVE_VOICE_ITEM = 1;
+//    private static final int RECEIVE_PICTURE_ITEM = 2;
+    private static final int SEND_ITEM = 3;
+//    private static final int SEND_VOICE_ITEM = 4;
+//    private static final int SEND_PICTURE_ITEM = 5;
+
+
     private static final int CHAT_TYPE_MESSAGE = 1;//普通文字消息
+    private static final int CHAT_TYPE_PICTURE = 2;
+    private static final int CHAT_TYPE_VOICE = 3;
+    private static final int REQUEST_PHOTO = 1;
+    private static final int REQUEST_CAMERA = 2;
 
     private ServiceConnection connection = new ServiceConnection() {
 
@@ -123,6 +135,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             myBinder = (MQTTService.MyBinder) service;
         }
     };
+
+
     private KeyboardChangeListener keyboardChangeListener;
     private boolean keyboardIsShown;
     //    ChatType_CHAT_TYPE_PICTURE,//图片消息
@@ -153,58 +167,88 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     @Override
     protected void setUpData(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        Intent serviceIntent = new Intent(this, MQTTService.class);
-        //startService(serviceIntent);
-        bindService(serviceIntent, connection, BIND_AUTO_CREATE);
-        // mEditorMenuView.
-        mInputEt.addTextChangedListener(this);
-        mInputEt.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && mMenuContainer.isShown()) {
-                    lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
-                    //hideEmotionLayout(true);//隐藏表情布局，显示软件盘
-//                    mEditorMenuView.setVisibility(View.GONE);
-//                    KeyboardUtils.showSoftInput(ChatActivity.this);
-                    hideMenuContainer(true);
-                    //软件盘显示后，释放内容高度
-                    unlockContentHeightDelayed();
-                }
-                return false;
-            }
-        });
-        keyboardChangeListener = new KeyboardChangeListener(this);
-        keyboardChangeListener.setKeyBoardListener(new KeyboardChangeListener.KeyBoardListener() {
-            @Override
-            public void onKeyboardChange(boolean isShow, int keyboardHeight) {
-                //Log.d(TAG, "isShow = [" + isShow + "], keyboardHeight = [" + keyboardHeight + "]");
-                keyboardIsShown = isShow;
-                if (isShow) {
-                    SPUtils.saveInt(ChatActivity.this, ConstantValues.KEYBOARD_HEIGHT, keyboardHeight);
-                }
-            }
-        });
-        mEmoView.initializeData(new EmoNormalGrid.OnEmoClickListener() {
-            @Override
-            public void onDeleteButtonClick() {
-                mInputEt.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
-                mInputEt.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-            }
+        bindService();
+        initInputEditor();
+        initKeyboard();
+        initEmoView();
+        initEditorMenuView();
+        initAudioRecordBtn();
+        setUpContact();
+    }
 
+    private void initAudioRecordBtn() {
+        mAudioRecordBtn.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
             @Override
-            public void onNormalEmoClick(String emo, int resId) {
-                emo = "[" + emo + "]";
-                SpannableStringBuilder parseEmo = EmoParser.parseEmo(ChatActivity.this, emo,25);
-                Editable editable = mInputEt.getText();
-                int index = mInputEt.getSelectionEnd();
-                if (index < mInputEt.length()) {
-                    editable.insert(index, parseEmo);
-                } else {
-                    editable.append(parseEmo);
-                }
-                mInputEt.setSelection(index + emo.length());
+            public void onFinish(final float seconds, final String filePath) {
+                sendVoice(seconds, null, filePath);
+                HttpEngin.getInstance().postFile(UrlHelper.UPLOAD_FILE + "?id=" + userinfo.getResData().getId() + "&deviceId=" + DeviceUtils.getAndroidID(),
+                        new File(filePath), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
+                            @Override
+                            public void inProgress(float progress, long total, int id) {
+
+                            }
+
+                            @Override
+                            public void onError(Call call, Exception e, int id) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onResponse(FileUploadResultEntity entity, int id) {
+                                if (entity.isFlag()) {
+                                    sendVoice(seconds, entity.getResData(), null);
+                                }
+                            }
+                        });
+
             }
         });
+    }
+
+    private void sendVoice(float seconds, String yourPath, String myPath) {
+        String key = "0000111122223333";
+        byte[] yourEncryptedMessage = null;
+        byte[] myEncryptedMessage = null;
+        if (yourPath != null) {
+            yourEncryptedMessage = MessageUtils.getEncryptedMessage((char) 33, key.getBytes(), userinfo.getResData().getId(),
+                    contact.getUid(), (byte) CHAT_TYPE_VOICE, (byte) 0,
+                    (int) (System.currentTimeMillis() / 1000), Math.round(seconds), yourPath.getBytes());
+        }
+        if (myPath != null) {
+            myEncryptedMessage = MessageUtils.getEncryptedMessage((char) 33, key.getBytes(), userinfo.getResData().getId(),
+                    contact.getUid(), (byte) CHAT_TYPE_VOICE, (byte) 0,
+                    (int) (System.currentTimeMillis() / 1000), Math.round(seconds), myPath.getBytes());
+        }
+        myBinder.publishVoice(yourEncryptedMessage, contact.getUid(), myEncryptedMessage);
+    }
+
+    private void initEditorMenuView() {
+        mEditorMenuView.setListener(new EditorMenuView.EditorMenuListener() {
+            @Override
+            public void onClick(int id) {
+                switch (id) {
+                    case R.id.mPhotoBtn:
+                        startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);
+                        break;
+                    case R.id.mCameraBtn:
+                        break;
+                    case R.id.mCallBtn:
+                        break;
+                    case R.id.mLocationBtn:
+                        break;
+                    case R.id.mPersonalBtn:
+                        break;
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setUpContact() {
         contact = (Contact) getIntent().getSerializableExtra(ConstantValues.CONTACT_INFO);
         setUpTitle(contact.getUsername());
         userinfo = new Gson().fromJson(SPUtils.getString(this, ConstantValues.USER_INFO, ""), Info.class);
@@ -224,15 +268,91 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                             mRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
                         }
                     }, 10);
+                    mAudioRecordBtn.setVisibility(View.GONE);
+                    mInputEt.setVisibility(View.VISIBLE);
+                    mVoiceBtn.setSelected(false);
                 }
             }
         });
+    }
+
+    private void initEmoView() {
+        mEmoView.initializeData(new EmoNormalGrid.OnEmoClickListener() {
+            @Override
+            public void onDeleteButtonClick() {
+                mInputEt.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                mInputEt.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
+            }
+
+            @Override
+            public void onNormalEmoClick(String emo, int resId) {
+//                emo = "[" + emo + "]";
+                if (!emo.contains("smile")) {
+                    return;
+                }
+                int i = emo.indexOf("_");
+                int j = Integer.parseInt(emo.substring(i + 1));
+                if (j >= EmoParser.emotions.length) {
+                    return;
+                }
+                emo = EmoParser.emotions[j];
+                SpannableStringBuilder parseEmo = EmoParser.parseEmo(ChatActivity.this, emo, 25);
+                Editable editable = mInputEt.getText();
+                int index = mInputEt.getSelectionEnd();
+                if (index < mInputEt.length()) {
+                    editable.insert(index, parseEmo);
+                } else {
+                    editable.append(parseEmo);
+                }
+                mInputEt.setSelection(index + emo.length());
+            }
+        });
+    }
+
+    private void initKeyboard() {
+        keyboardChangeListener = new KeyboardChangeListener(this);
+        keyboardChangeListener.setKeyBoardListener(new KeyboardChangeListener.KeyBoardListener() {
+            @Override
+            public void onKeyboardChange(boolean isShow, int keyboardHeight) {
+                //Log.d(TAG, "isShow = [" + isShow + "], keyboardHeight = [" + keyboardHeight + "]");
+                keyboardIsShown = isShow;
+                if (isShow) {
+                    SPUtils.saveInt(ChatActivity.this, ConstantValues.KEYBOARD_HEIGHT, keyboardHeight);
+                }
+            }
+        });
+    }
+
+    private void initInputEditor() {
+        mInputEt.addTextChangedListener(this);
+        mInputEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP && mMenuContainer.isShown()) {
+                    lockContentHeight();//显示软件盘时，锁定内容高度，防止跳闪。
+                    //hideEmotionLayout(true);//隐藏表情布局，显示软件盘
+//                    mEditorMenuView.setVisibility(View.GONE);
+//                    KeyboardUtils.showSoftInput(ChatActivity.this);
+                    hideMenuContainer(true);
+                    //软件盘显示后，释放内容高度
+                    unlockContentHeightDelayed();
+                }
+                return false;
+            }
+        });
+    }
+
+    private void bindService() {
+        Intent serviceIntent = new Intent(this, MQTTService.class);
+        //startService(serviceIntent);
+        bindService(serviceIntent, connection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         scrollToBottom();
+        MediaManager.resume();
     }
 
     private void scrollToBottom() {
@@ -246,6 +366,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.mVoiceBtn:
+                mVoiceBtn.setSelected(!mVoiceBtn.isSelected());
+                ifShowAudioRecorderButton(mVoiceBtn.isSelected());
                 break;
             case R.id.mFireBtn:
                 break;
@@ -258,6 +380,22 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             case R.id.mAddBtn:
                 showMenu();
                 break;
+        }
+    }
+
+    private void ifShowAudioRecorderButton(boolean isSelected) {
+        if (isSelected) {
+            if (mMenuContainer.getVisibility() == View.VISIBLE) {
+                hideMenuContainer(false);
+                mMenuContainer.setVisibility(View.GONE);
+            }
+            KeyboardUtils.hideSoftInput(this);
+            mInputEt.setVisibility(View.GONE);
+            mAudioRecordBtn.setVisibility(View.VISIBLE);
+        } else {
+            KeyboardUtils.showSoftInput(this);
+            mInputEt.setVisibility(View.VISIBLE);
+            mAudioRecordBtn.setVisibility(View.GONE);
         }
     }
 
@@ -312,7 +450,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             if (!isEmo) {
                 mEditorMenuView.setVisibility(View.VISIBLE);
                 mEmoView.setVisibility(View.GONE);
-            }else {
+            } else {
                 mEditorMenuView.setVisibility(View.GONE);
                 mEmoView.setVisibility(View.VISIBLE);
             }
@@ -383,9 +521,25 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         @Override
         public int getItemViewType(int position) {
             Chat chat = chatList.get(position);
+            //    ChatType_CHAT_TYPE_MESSAGE = 1,//普通文字消息
+            //    ChatType_CHAT_TYPE_PICTURE=2,//图片消息
+            //    ChatType_CHAT_TYPE_AUDIO=3,//语音消息
+            //    ChatType_CHAT_TYPE_VIDEO,//视频消息
             if (chat.getIsSend() == 0) {
+//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_VOICE) {
+//                    return RECEIVE_VOICE_ITEM;
+//                }
+//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_PICTURE) {
+//                    return RECEIVE_PICTURE_ITEM;
+//                }
                 return RECEIVE_ITEM;
             } else {
+//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_VOICE) {
+//                    return SEND_VOICE_ITEM;
+//                }
+//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_PICTURE) {
+//                    return SEND_PICTURE_ITEM;
+//                }
                 return SEND_ITEM;
             }
         }
@@ -406,10 +560,10 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             if (getItemViewType(position) == RECEIVE_ITEM) {
                 ReceiveViewHolder receiveViewHolder = (ReceiveViewHolder) holder;
-                receiveViewHolder.bindData(position);
+                receiveViewHolder.bindData(position, false);
             } else {
                 SendViewHolder sendViewHolder = (SendViewHolder) holder;
-                sendViewHolder.bindData(position);
+                sendViewHolder.bindData(position, true);
             }
 
         }
@@ -427,6 +581,14 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         PortraitView mPortraitView;
         @Bind(R.id.mChatTv)
         TextView mChatTv;
+        @Bind(R.id.mPictureView)
+        ImageView mPictureView;
+        @Bind(R.id.mAnimView)
+        View mAnimView;
+        @Bind(R.id.mTimeLengthView)
+        TextView mTimeLengthView;
+        @Bind(R.id.mMessageContainer)
+        FrameLayout mMessageContainer;
 
         public BaseHolder(View itemView) {
             super(itemView);
@@ -434,7 +596,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindData(int position) {
+        public void bindData(int position, boolean isSend) {
             Chat chat = chatList.get(position);
             if (position == 0) {
                 mTimeTv.setVisibility(View.VISIBLE);
@@ -450,11 +612,61 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             mTimeTv.setText(TimeUtils.millis2String((long) MessageUtils.getTime(chat.getMessage()) * 1000, simpleDateFormat));
             setPortrait();
             byte messageType = MessageUtils.getMessageType(chat.getMessage());
-            if (messageType == CHAT_TYPE_MESSAGE) {
-//                mChatTv.setText(MessageUtils.getPlainMessage(chat.getMessage()));
-                mChatTv.setText(EmoParser.parseEmo(ChatActivity.this, MessageUtils.getPlainMessage(chat.getMessage()),25));
+            switch (messageType) {
+                case CHAT_TYPE_MESSAGE:
+                    mAnimView.setVisibility(View.GONE);
+                    mPictureView.setVisibility(View.GONE);
+                    mChatTv.setVisibility(View.VISIBLE);
+                    mTimeLengthView.setVisibility(View.GONE);
+                    mChatTv.setText(EmoParser.parseEmo(ChatActivity.this, MessageUtils.getMessage(chat.getMessage()), 25));
+                    break;
+                case CHAT_TYPE_VOICE:
+                    mAnimView.setVisibility(View.VISIBLE);
+                    mPictureView.setVisibility(View.GONE);
+                    mChatTv.setVisibility(View.GONE);
+                    mTimeLengthView.setVisibility(View.VISIBLE);
+                    byte voiceLength = MessageUtils.getVoiceLength(chat.getMessage());
+                    final String path = MessageUtils.getPath(chat.getMessage());
+                    mTimeLengthView.setText(voiceLength + "\"");
+                    int widthPixels = SupportMultipleScreensUtil.getWidthPixels(ChatActivity.this);
+                    int minWidth = (int) (widthPixels * 0.15f);
+                    int maxWidth = (int) (widthPixels * 0.7f);
+                    ViewGroup.LayoutParams layoutParams = mMessageContainer.getLayoutParams();
+                    layoutParams.width = (int) (minWidth + maxWidth * (voiceLength * 1.0f / 60));
+                    mMessageContainer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mAnimViewLabel != null) {
+                                mAnimViewLabel.setBackgroundResource(getAnimBackground());
+                                mAnimViewLabel = null;
+                            }
+                            mAnimViewLabel = mAnimView;
+                            mAnimViewLabel.setBackgroundResource(getAnimDrawable());
+                            AnimationDrawable anim = (AnimationDrawable) mAnimViewLabel.getBackground();
+                            anim.start();
+                            MediaManager.playSound(path, new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    mAnimViewLabel.setBackgroundResource(getAnimBackground());
+                                }
+                            });
+                        }
+                    });
+
+                    break;
+                case CHAT_TYPE_PICTURE:
+                    mAnimView.setVisibility(View.GONE);
+                    mPictureView.setVisibility(View.VISIBLE);
+                    mChatTv.setVisibility(View.GONE);
+                    mTimeLengthView.setVisibility(View.GONE);
+                    break;
             }
+
         }
+
+        protected abstract int getAnimBackground();
+
+        public abstract int getAnimDrawable();
 
         /**
          * 根据不同的角色设置不同的头像
@@ -470,6 +682,16 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         }
 
         @Override
+        protected int getAnimBackground() {
+            return R.mipmap.mes_oppovoiceplay3;
+        }
+
+        @Override
+        public int getAnimDrawable() {
+            return R.drawable.your_play_anim;
+        }
+
+        @Override
         protected void setPortrait() {
             mPortraitView.setPortrait(ChatActivity.this, contact.getLogo(), contact.getUsername());
         }
@@ -482,9 +704,25 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         }
 
         @Override
+        protected int getAnimBackground() {
+            return R.mipmap.mes_myvoiceplay3;
+        }
+
+        @Override
+        public int getAnimDrawable() {
+            return R.drawable.my_play_anim;
+        }
+
+        @Override
         protected void setPortrait() {
             mPortraitView.setPortrait(ChatActivity.this, userinfo.getResData().getLogo(), userinfo.getResData().getUsername());
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MediaManager.pause();
     }
 
     @Override
@@ -492,8 +730,10 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         super.onDestroy();
         EventBus.getDefault().unregister(this);
         unbindService(connection);
+        MediaManager.release();
         //keyboardChangeListener.destroy();
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void getMqttMessage(MessageEvent event) {
