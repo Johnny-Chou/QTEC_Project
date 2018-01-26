@@ -61,7 +61,7 @@ public class AudioManager {
             String fileName = generateFileName();
             File file = new File(dir, fileName);
 
-            mCurrentFilePath =file.getAbsolutePath();
+            mCurrentFilePath = file.getAbsolutePath();
 
             mMediaRecorder = new MediaRecorder();
             // 设置输出文件
@@ -113,9 +113,10 @@ public class AudioManager {
      * 释放资源
      */
     public void release() {
-        //mMediaRecorder.stop();
-        mMediaRecorder.reset();
-        mMediaRecorder = null;
+        if (mMediaRecorder != null) {
+            mMediaRecorder.reset();
+            mMediaRecorder = null;
+        }
     }
 
     /**

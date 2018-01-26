@@ -630,7 +630,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                     mTimeLengthView.setText(voiceLength + "\"");
                     int widthPixels = SupportMultipleScreensUtil.getWidthPixels(ChatActivity.this);
                     int minWidth = (int) (widthPixels * 0.15f);
-                    int maxWidth = (int) (widthPixels * 0.7f);
+                    int maxWidth = (int) (widthPixels * 0.45f);
                     ViewGroup.LayoutParams layoutParams = mMessageContainer.getLayoutParams();
                     layoutParams.width = (int) (minWidth + maxWidth * (voiceLength * 1.0f / 60));
                     mMessageContainer.setOnClickListener(new View.OnClickListener() {

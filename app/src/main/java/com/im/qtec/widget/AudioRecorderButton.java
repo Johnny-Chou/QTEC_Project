@@ -34,10 +34,14 @@ public class AudioRecorderButton extends TextView {
     private float mTime;
     // 是否触发longClick
     private boolean mReady;
+    private boolean haveHandleRecord;
 
     private static final int MSG_AUDIO_PREPARED = 0x110;
     private static final int MSG_VOICE_CHANGED = 0x111;
     private static final int MSG_DIALOG_DIMISS = 0x112;
+    private static final int MSG_DIALOG_COUNTDOWN = 0x113;
+    private static final int MSG_DIALOG_TOOLONG = 0x114;
+    private static final int MSG_DIALOG_HANDLERECORD = 0x115;
 
     /*
      * 获取音量大小的线程
@@ -49,6 +53,14 @@ public class AudioRecorderButton extends TextView {
                 try {
                     Thread.sleep(100);
                     mTime += 0.1f;
+                    if (mTime > 60 && !haveHandleRecord) {
+                        mHandler.sendEmptyMessage(MSG_DIALOG_TOOLONG);
+                        mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1000);// 延迟显示对话框
+                        mHandler.sendEmptyMessage(MSG_DIALOG_HANDLERECORD);
+                    }
+                    if (mTime >= 50 && mTime <= 60) {
+                        mHandler.sendEmptyMessage(MSG_DIALOG_COUNTDOWN);
+                    }
                     mHandler.sendEmptyMessage(MSG_VOICE_CHANGED);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -78,6 +90,17 @@ public class AudioRecorderButton extends TextView {
                     mDialogManager.dimissDialog();
                     break;
 
+                case MSG_DIALOG_COUNTDOWN:
+                    mDialogManager.countDown(60 - (int) mTime);
+                    break;
+
+                case MSG_DIALOG_TOOLONG:
+                    mDialogManager.tooLong();
+                    break;
+                case MSG_DIALOG_HANDLERECORD:
+                    handleRecord();
+                    break;
+
             }
 
             super.handleMessage(msg);
@@ -91,7 +114,7 @@ public class AudioRecorderButton extends TextView {
         super(context, attrs);
         mDialogManager = new DialogManager(context);
         //String dir = "/storage/sdcard0/my_weixin";
-        String dir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/qtec";
+        String dir = context.getFilesDir().getAbsolutePath() + "/qtec";
 
         mAudioManager = AudioManager.getInstance(dir);
         mAudioManager.setOnAudioStateListener(new AudioManager.AudioStateListener() {
@@ -145,6 +168,7 @@ public class AudioRecorderButton extends TextView {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 //changeState(STATE_RECORDING);
+                haveHandleRecord = false;
                 break;
             case MotionEvent.ACTION_MOVE:
 
@@ -155,35 +179,45 @@ public class AudioRecorderButton extends TextView {
                     } else {
                         changeState(STATE_RECORDING);
                     }
+
                 }
 
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mReady) {
-                    reset();
-                    return super.onTouchEvent(event);
+                if (!haveHandleRecord) {
+                    handleRecord();
                 }
-                if (!isRecording || mTime < 0.6f) {
-                    mDialogManager.tooShort();
-                    mAudioManager.cancel();
-                    mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1000);// 延迟显示对话框
-                } else if (mCurrentState == STATE_RECORDING) { // 正在录音的时候，结束
-                    mDialogManager.dimissDialog();
-                    mAudioManager.release();
-
-                    if (audioFinishRecorderListener != null) {
-                        audioFinishRecorderListener.onFinish(mTime,mAudioManager.getCurrentFilePath());
-                    }
-
-                } else if (mCurrentState == STATE_WANT_TO_CANCEL) { // 想要取消
-                    mDialogManager.dimissDialog();
-                    mAudioManager.cancel();
-                }
-                reset();
                 break;
 
         }
         return super.onTouchEvent(event);
+    }
+
+    public void handleRecord() {
+        if (!mReady) {
+            reset();
+            // return super.onTouchEvent(event);
+        }
+        if (!isRecording || mTime < 0.6f) {
+            mDialogManager.tooShort();
+            mAudioManager.cancel();
+            mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1000);// 延迟显示对话框
+        } else if (mCurrentState == STATE_RECORDING) { // 正在录音的时候，结束
+            if (mTime < 60) {
+                mDialogManager.dimissDialog();
+            }
+            mAudioManager.release();
+
+            if (audioFinishRecorderListener != null) {
+                audioFinishRecorderListener.onFinish(mTime, mAudioManager.getCurrentFilePath());
+            }
+
+        } else if (mCurrentState == STATE_WANT_TO_CANCEL) { // 想要取消
+            mDialogManager.dimissDialog();
+            mAudioManager.cancel();
+        }
+        reset();
+        haveHandleRecord = true;
     }
 
     /**
@@ -223,7 +257,7 @@ public class AudioRecorderButton extends TextView {
                 case STATE_RECORDING:
                     setBackgroundResource(R.drawable.btn_recorder_recording);
                     setText(R.string.str_recorder_recording);
-                    if (isRecording) {
+                    if (isRecording && mTime < 50) {
                         mDialogManager.recording();
                     }
                     break;
@@ -231,8 +265,9 @@ public class AudioRecorderButton extends TextView {
                 case STATE_WANT_TO_CANCEL:
                     setBackgroundResource(R.drawable.btn_recorder_recording);
                     setText(R.string.str_recorder_want_cancel);
-
-                    mDialogManager.wantToCancel();
+                    if (mTime < 50) {
+                        mDialogManager.wantToCancel();
+                    }
                     break;
             }
         }

@@ -31,6 +31,7 @@ public class DialogManager {
     private Context mContext;
 
     private AlertDialog dialog;//用于取消AlertDialog.Builder
+    private TextView mSecondsTv;
 
     /**
      * 构造方法 传入上下文
@@ -50,6 +51,7 @@ public class DialogManager {
         mVoice = view.findViewById(R.id.id_recorder_dialog_voice);
         mLable = view.findViewById(R.id.id_recorder_dialog_label);
         mCancle = view.findViewById(R.id.id_recorder_dialog_cancle);
+        mSecondsTv = view.findViewById(R.id.mSecondsTv);
 
         builder.setView(view);
         builder.create();
@@ -62,6 +64,7 @@ public class DialogManager {
             mVoice.setVisibility(View.VISIBLE);
             mLable.setVisibility(View.VISIBLE);
             mCancle.setVisibility(View.GONE);
+            mSecondsTv.setVisibility(View.GONE);
             mIcon.setImageResource(R.mipmap.recorder);
             mLable.setText("手指上滑，取消发送");
         }
@@ -74,6 +77,7 @@ public class DialogManager {
             mVoice.setVisibility(View.GONE);
             mLable.setVisibility(View.VISIBLE);
             mCancle.setVisibility(View.VISIBLE);
+            mSecondsTv.setVisibility(View.GONE);
             //mIcon.setImageResource(R.mipmap.cancel);
             mLable.setText("松开手指，取消发送");
         }
@@ -85,9 +89,35 @@ public class DialogManager {
             mIcon.setVisibility(View.GONE);
             mVoice.setVisibility(View.GONE);
             mLable.setVisibility(View.VISIBLE);
-
+            mSecondsTv.setVisibility(View.GONE);
+            mCancle.setVisibility(View.VISIBLE);
             mCancle.setImageResource(R.mipmap.voice_to_short);
             mLable.setText("录音时间过短");
+        }
+    }
+
+    // 显示时间过短的对话框
+    public void tooLong() {
+        if(dialog != null && dialog.isShowing()){ //显示状态
+            mIcon.setVisibility(View.GONE);
+            mVoice.setVisibility(View.GONE);
+            mLable.setVisibility(View.VISIBLE);
+            mSecondsTv.setVisibility(View.GONE);
+            mCancle.setVisibility(View.VISIBLE);
+            mCancle.setImageResource(R.mipmap.voice_to_short);
+            mLable.setText("录音时间过长");
+        }
+    }
+
+    public void countDown(int seconds) {
+        if(dialog != null && dialog.isShowing()){ //显示状态
+            mIcon.setVisibility(View.GONE);
+            mVoice.setVisibility(View.GONE);
+            mLable.setVisibility(View.VISIBLE);
+            mCancle.setVisibility(View.GONE);
+            mSecondsTv.setVisibility(View.VISIBLE);
+            mSecondsTv.setText("" + seconds);
+            mLable.setText("手指上滑，取消发送");
         }
     }
 

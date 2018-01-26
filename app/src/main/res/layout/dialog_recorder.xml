@@ -31,6 +31,14 @@
             android:layout_width="50px"
             android:layout_height="76px"
             android:src="@mipmap/v1" />
+
+        <TextView
+            android:id="@+id/mSecondsTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50px"
+            android:visibility="gone"
+            android:layout_centerInParent="true"/>
     </RelativeLayout>
 
     <TextView

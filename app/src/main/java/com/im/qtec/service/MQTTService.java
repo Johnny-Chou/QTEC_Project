@@ -11,8 +11,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.DeviceUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.im.qtec.activity.MainActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.db.Chat;
@@ -217,13 +219,12 @@ public class MQTTService extends Service {
 
                         @Override
                         public void onError(Call call, Exception e, int id) {
-
+                            ToastUtils.showLong("接收语音失败");
                         }
 
                         @Override
                         public void onResponse(String s, int id) {
-                            MessageUtils.setMessageContent(payload, s.getBytes());
-                            saveMessage(payload, 0, uid);
+                            saveMessage(MessageUtils.setMessageContent(payload, s.getBytes()), 0, uid);
                             EventBus.getDefault().post(new MessageEvent());
                         }
                     });

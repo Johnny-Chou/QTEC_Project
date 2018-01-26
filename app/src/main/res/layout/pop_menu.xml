@@ -23,9 +23,10 @@
 
                 <ImageButton
                     android:id="@+id/mPhotoBtn"
-                    android:layout_width="65px"
-                    android:layout_height="65px"
+                    android:layout_width="70px"
+                    android:layout_height="70px"
                     android:background="@null"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/mes_itempic" />
 
                 <TextView
@@ -52,9 +53,10 @@
 
                 <ImageButton
                     android:id="@+id/mCameraBtn"
-                    android:layout_width="65px"
-                    android:layout_height="65px"
+                    android:layout_width="70px"
+                    android:layout_height="70px"
                     android:background="@null"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/mes_itemphoto" />
 
                 <TextView
@@ -81,9 +83,10 @@
 
                 <ImageButton
                     android:id="@+id/mCallBtn"
-                    android:layout_width="65px"
-                    android:layout_height="65px"
+                    android:layout_width="70px"
+                    android:layout_height="70px"
                     android:background="@null"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/mes_itemcall" />
 
                 <TextView
@@ -110,9 +113,10 @@
 
                 <ImageButton
                     android:id="@+id/mLocationBtn"
-                    android:layout_width="65px"
-                    android:layout_height="65px"
+                    android:layout_width="70px"
+                    android:layout_height="70px"
                     android:background="@null"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/mes_itemloc" />
 
                 <TextView
@@ -148,9 +152,10 @@
 
                 <ImageButton
                     android:id="@+id/mPersonalBtn"
-                    android:layout_width="65px"
-                    android:layout_height="65px"
+                    android:layout_width="70px"
+                    android:layout_height="70px"
                     android:background="@null"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/mes_friends" />
 
                 <TextView
