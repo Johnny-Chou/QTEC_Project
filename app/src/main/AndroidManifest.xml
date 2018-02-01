@@ -63,6 +63,19 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <activity android:name="com.donkingliang.imageselector.ImageSelectorActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity android:name="com.donkingliang.imageselector.PreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.donkingliang.imageselector.ClipImageActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <service android:name="org.eclipse.paho.android.service.MqttService"
             android:exported="false"/>
         <service android:name="com.im.qtec.service.MQTTService"

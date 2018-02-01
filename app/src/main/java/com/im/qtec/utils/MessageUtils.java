@@ -171,8 +171,9 @@ public class MessageUtils {
         byte[] receiver = intToBytes(receiverid);
         byte[] time = intToBytes(timestamp);
         try {
-            byte[] encryptContent = EncryptUtils.encryptAES(messageContent, key);
-            byte[] message = new byte[headerLength + encryptContent.length];
+            //byte[] encryptContent = EncryptUtils.encryptAES(messageContent, key);
+            //byte[] message = new byte[headerLength + encryptContent.length];
+            byte[] message = new byte[headerLength + messageContent.length];
             for (int i = 0; i < message.length; i++) {
                 if (i < 2) {
                     message[i] = header[i];
@@ -191,7 +192,8 @@ public class MessageUtils {
                 } else if (messageType == 3 && i == 32) {
                     message[i] = (byte) voiceLength;
                 } else if (i >= headerLength) {
-                    message[i] = encryptContent[i - headerLength];
+                    //message[i] = encryptContent[i - headerLength];
+                    message[i] = messageContent[i - headerLength];
                 }
             }
             return message;

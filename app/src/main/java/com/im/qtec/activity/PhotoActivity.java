@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +20,8 @@ import android.widget.ImageView;
 import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
@@ -45,7 +48,7 @@ import okhttp3.Call;
  * Created by zhouyanglei on 2018/1/10.
  */
 
-public class PhotoActivity extends BaseActivity{
+public class PhotoActivity extends BaseActivity {
 
     private RecyclerView mPhotoRv;
     private List<String> systemPhotoList;
@@ -73,7 +76,7 @@ public class PhotoActivity extends BaseActivity{
         mSendPicBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedPhotoList.size() > 0){
+                if (selectedPhotoList.size() > 0) {
                     for (int i = 0; i < selectedPhotoList.size(); i++) {
                         final int index = i;
                         HttpEngin.getInstance().postFile(url, new File(selectedPhotoList.get(i)), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
@@ -89,7 +92,7 @@ public class PhotoActivity extends BaseActivity{
 
                             @Override
                             public void onResponse(FileUploadResultEntity entity, int id) {
-                                if (entity.isFlag()){
+                                if (entity.isFlag()) {
                                     String picUrl = entity.getResData();
                                 }
                             }
@@ -109,7 +112,7 @@ public class PhotoActivity extends BaseActivity{
     }
 
     public List<String> getSystemPhotoList(Context context) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         ContentResolver contentResolver = context.getContentResolver();
@@ -169,10 +172,14 @@ public class PhotoActivity extends BaseActivity{
                 public void onClick(View v) {
                     if (mSelectBtn.isSelected()) {
                         mSelectBtn.setSelected(false);
-                        selectedPhotoList.remove(photoPath);
+                        if (selectedPhotoList.contains(photoPath)) {
+                            selectedPhotoList.remove(photoPath);
+                        }
                     } else {
                         mSelectBtn.setSelected(true);
-                        selectedPhotoList.add(photoPath);
+                        if (!selectedPhotoList.contains(photoPath)) {
+                            selectedPhotoList.add(photoPath);
+                        }
                     }
                     if (selectedPhotoList.size() == 0) {
                         mSendPicBtn.setText(R.string.send);
@@ -186,15 +193,15 @@ public class PhotoActivity extends BaseActivity{
         private void attachPhoto(final String photoPath) {
             Glide.with(PhotoActivity.this).asBitmap()
                     //.thumbnail(Glide.with(this).asBitmap().load(R.mipmap.ic_launcher))
-                    .load(photoPath)
-                    //.apply(new RequestOptions().centerCrop().placeholder(new BitmapDrawable()))
-                    .into(new SimpleTarget<Bitmap>() {
+                    .load(new File(photoPath))
+                    .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE))
+                    .into(mPhotoView/*new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                             mPhotoView.setTag(R.id.is_photo_tag, photoPath);
                             mPhotoView.setImageBitmap(resource);
                         }
-                    });
+                    }*/);
         }
     }
 }

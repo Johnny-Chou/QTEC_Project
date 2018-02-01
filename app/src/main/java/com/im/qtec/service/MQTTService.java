@@ -210,7 +210,7 @@ public class MQTTService extends Service {
 
                 final byte[] payload = message.getPayload();
                 if (MessageUtils.getMessageType(payload) == CHAT_TYPE_VOICE) {
-                    String voiceUrl = MessageUtils.getMessage(payload);
+                    String voiceUrl = new String(MessageUtils.getMessageContent(payload));
                     HttpEngin.getInstance().getFile(voiceUrl, getFilesDir().getAbsolutePath(), generateFileName(), new HttpEngin.FileLoadListener<String>() {
                         @Override
                         public void inProgress(float progress, long total, int id) {

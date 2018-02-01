@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.im.qtec.R;
 import com.im.qtec.core.AudioManager;
 import com.im.qtec.core.DialogManager;
+import com.im.qtec.core.MediaManager;
 
 /**
  * Created by zhouyanglei on 2018/1/19.
@@ -24,6 +25,7 @@ public class AudioRecorderButton extends TextView {
     private static final int STATE_WANT_TO_CANCEL = 3;// 希望取消
 
     private int mCurrentState = STATE_NORMAL; // 当前的状态
+
     private boolean isRecording = false;// 已经开始录音
 
     private static final int DISTANCE_Y_CANCEL = 50;
@@ -34,7 +36,7 @@ public class AudioRecorderButton extends TextView {
     private float mTime;
     // 是否触发longClick
     private boolean mReady;
-    private boolean haveHandleRecord;
+    private volatile boolean haveHandleRecord;
 
     private static final int MSG_AUDIO_PREPARED = 0x110;
     private static final int MSG_VOICE_CHANGED = 0x111;
@@ -53,7 +55,8 @@ public class AudioRecorderButton extends TextView {
                 try {
                     Thread.sleep(100);
                     mTime += 0.1f;
-                    if (mTime > 60 && !haveHandleRecord) {
+                    if (mTime >= 60 && !haveHandleRecord) {
+                        isRecording = false;
                         mHandler.sendEmptyMessage(MSG_DIALOG_TOOLONG);
                         mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1000);// 延迟显示对话框
                         mHandler.sendEmptyMessage(MSG_DIALOG_HANDLERECORD);
@@ -128,6 +131,8 @@ public class AudioRecorderButton extends TextView {
         setOnLongClickListener(new OnLongClickListener() {
 
             public boolean onLongClick(View v) {
+                MediaManager.release();
+                onRecordingListener.onRecording();
                 changeState(STATE_RECORDING);
                 mReady = true;
 
@@ -142,6 +147,19 @@ public class AudioRecorderButton extends TextView {
         this(context, null);
     }
 
+    private OnRecordingListener onRecordingListener;
+
+    public void setOnRecordingListener(OnRecordingListener onRecordingListener) {
+        this.onRecordingListener = onRecordingListener;
+    }
+
+
+    /**
+     * 开始录音时的回调
+     */
+    public interface OnRecordingListener {
+        void onRecording();
+    }
     /**
      * 录音完成后的回调
      */
@@ -198,7 +216,7 @@ public class AudioRecorderButton extends TextView {
             reset();
             // return super.onTouchEvent(event);
         }
-        if (!isRecording || mTime < 0.6f) {
+        if (isRecording && mTime < 0.6f) {
             mDialogManager.tooShort();
             mAudioManager.cancel();
             mHandler.sendEmptyMessageDelayed(MSG_DIALOG_DIMISS, 1000);// 延迟显示对话框

@@ -27,9 +27,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.DeviceUtils;
+import com.blankj.utilcode.util.EncryptUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.donkingliang.imageselector.utils.ImageSelectorUtils;
 import com.google.gson.Gson;
 import com.im.qtec.R;
 import com.im.qtec.constants.ConstantValues;
@@ -177,6 +179,15 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     }
 
     private void initAudioRecordBtn() {
+        mAudioRecordBtn.setOnRecordingListener(new AudioRecorderButton.OnRecordingListener() {
+            @Override
+            public void onRecording() {
+                if (mAnimViewLabel != null && mAnimViewLabel.getTag() != null) {
+                    boolean isSend = (boolean) mAnimViewLabel.getTag();
+                    mAnimViewLabel.setBackgroundResource(isSend ? R.mipmap.mes_myvoiceplay3 : R.mipmap.mes_oppovoiceplay3);
+                }
+            }
+        });
         mAudioRecordBtn.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
             @Override
             public void onFinish(final float seconds, final String filePath) {
@@ -228,7 +239,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             public void onClick(int id) {
                 switch (id) {
                     case R.id.mPhotoBtn:
-                        startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);
+                        //startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);
+                        ImageSelectorUtils.openPhotoAndClip(ChatActivity.this, 1);
                         break;
                     case R.id.mCameraBtn:
                         break;
@@ -521,25 +533,9 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         @Override
         public int getItemViewType(int position) {
             Chat chat = chatList.get(position);
-            //    ChatType_CHAT_TYPE_MESSAGE = 1,//普通文字消息
-            //    ChatType_CHAT_TYPE_PICTURE=2,//图片消息
-            //    ChatType_CHAT_TYPE_AUDIO=3,//语音消息
-            //    ChatType_CHAT_TYPE_VIDEO,//视频消息
             if (chat.getIsSend() == 0) {
-//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_VOICE) {
-//                    return RECEIVE_VOICE_ITEM;
-//                }
-//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_PICTURE) {
-//                    return RECEIVE_PICTURE_ITEM;
-//                }
                 return RECEIVE_ITEM;
             } else {
-//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_VOICE) {
-//                    return SEND_VOICE_ITEM;
-//                }
-//                if (MessageUtils.getMessageType(chat.getMessage()) == CHAT_TYPE_PICTURE) {
-//                    return SEND_PICTURE_ITEM;
-//                }
                 return SEND_ITEM;
             }
         }
@@ -596,7 +592,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindData(int position, boolean isSend) {
+        public void bindData(int position, final boolean isSend) {
             Chat chat = chatList.get(position);
             if (position == 0) {
                 mTimeTv.setVisibility(View.VISIBLE);
@@ -626,7 +622,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                     mChatTv.setVisibility(View.GONE);
                     mTimeLengthView.setVisibility(View.VISIBLE);
                     byte voiceLength = MessageUtils.getVoiceLength(chat.getMessage());
-                    final String path = MessageUtils.getPath(chat.getMessage());
+                    //final String path = MessageUtils.getPath(chat.getMessage());
+                    final String path = new String(MessageUtils.getMessageContent(chat.getMessage()));
                     mTimeLengthView.setText(voiceLength + "\"");
                     int widthPixels = SupportMultipleScreensUtil.getWidthPixels(ChatActivity.this);
                     int minWidth = (int) (widthPixels * 0.15f);
@@ -641,6 +638,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                                 mAnimViewLabel = null;
                             }
                             mAnimViewLabel = mAnimView;
+                            mAnimViewLabel.setTag(isSend);
                             mAnimViewLabel.setBackgroundResource(getAnimDrawable());
                             AnimationDrawable anim = (AnimationDrawable) mAnimViewLabel.getBackground();
                             anim.start();

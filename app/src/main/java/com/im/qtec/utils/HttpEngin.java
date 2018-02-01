@@ -88,10 +88,10 @@ public class HttpEngin<T> {
     }
 
     public void getFile(String url, String filePath, String fileName, final FileLoadListener<String> fileLoadListener) {
-        OkHttpUtils//
-                .get()//
-                .url(url)//
-                .build()//
+        OkHttpUtils
+                .get()
+                .url(url)
+                .build()
                 .execute(new FileCallBack(filePath, fileName) {
                     @Override
                     public void inProgress(float progress, long total, int id) {
