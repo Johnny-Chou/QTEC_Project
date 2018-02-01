@@ -1,8 +1,12 @@
 package com.im.qtec.application;
 
+import android.app.Application;
+
+import com.blankj.utilcode.util.EncryptUtils;
 import com.blankj.utilcode.util.Utils;
 import com.im.qtec.core.AppStatusTracker;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.log.LoggerInterceptor;
 
 import org.litepal.LitePalApplication;
 
@@ -28,5 +32,8 @@ public class MyApplication extends LitePalApplication {
 
         OkHttpUtils.initClient(okHttpClient);
         Utils.init(this);
+        //加载pjsua2
+        System.loadLibrary("pjsua2");
+
     }
 }
