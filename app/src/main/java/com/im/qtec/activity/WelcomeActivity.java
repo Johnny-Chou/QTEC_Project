@@ -3,9 +3,6 @@ package com.im.qtec.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -20,14 +17,19 @@ import com.im.qtec.entity.CheckRequestEntity;
 import com.im.qtec.entity.CheckResult;
 import com.im.qtec.utils.HttpEngin;
 import com.im.qtec.utils.SPUtils;
-import com.im.qtec.utils.SupportMultipleScreensUtil;
 import com.im.qtec.utils.UrlHelper;
 
+import org.reactivestreams.Subscriber;
+
+import io.reactivex.Emitter;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Call;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 
 /**
@@ -74,36 +76,32 @@ public class WelcomeActivity extends BaseActivity implements HttpEngin.HttpListe
         endAnimation.setFillAfter(true);
         startAnimation.setDuration(1000);
         endAnimation.setDuration(1000);
-        Observable.create(new Observable.OnSubscribe<Integer>() {
+        Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
-            public void call(Subscriber<? super Integer> subscriber) {
+            public void subscribe(ObservableEmitter<Integer> emitter){
                 for (int i = 0; i < 3; i++) {
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    subscriber.onNext(i);
+                    emitter.onNext(i);
                 }
-                subscriber.onCompleted();
+                emitter.onComplete();
             }
         })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Integer>() {
+                .subscribe(new Observer<Integer>() {
                     @Override
-                    public void onStart() {
-                        super.onStart();
+                    public void onSubscribe(Disposable d) {
                         mIvSlogan.startAnimation(startAnimation);
                     }
 
                     @Override
-                    public void onCompleted() {
-                        if (SPUtils.getInt(WelcomeActivity.this, ConstantValues.USER_ID, -1) == -1) {
-                            startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
-                            finish();
-                        } else {
-                            checkLogin();
+                    public void onNext(Integer integer) {
+                        if (integer == 1) {
+                            mIvSlogan.startAnimation(endAnimation);
                         }
                     }
 
@@ -113,9 +111,12 @@ public class WelcomeActivity extends BaseActivity implements HttpEngin.HttpListe
                     }
 
                     @Override
-                    public void onNext(Integer integer) {
-                        if (integer == 1) {
-                            mIvSlogan.startAnimation(endAnimation);
+                    public void onComplete() {
+                        if (SPUtils.getInt(WelcomeActivity.this, ConstantValues.USER_ID, -1) == -1) {
+                            startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+                            finish();
+                        } else {
+                            checkLogin();
                         }
                     }
                 });

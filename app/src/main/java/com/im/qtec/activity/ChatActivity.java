@@ -123,8 +123,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     private static final int CHAT_TYPE_MESSAGE = 1;//普通文字消息
     private static final int CHAT_TYPE_PICTURE = 2;
     private static final int CHAT_TYPE_VOICE = 3;
-    private static final int REQUEST_PHOTO = 1;
-    private static final int REQUEST_CAMERA = 2;
+    private static final int REQUEST_PHOTO = 100;
+    private static final int REQUEST_CAMERA = 200;
 
     private ServiceConnection connection = new ServiceConnection() {
 
@@ -239,10 +239,11 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             public void onClick(int id) {
                 switch (id) {
                     case R.id.mPhotoBtn:
-                        //startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);
-                        ImageSelectorUtils.openPhotoAndClip(ChatActivity.this, 1);
+                        //startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);选择图片
+                        ImageSelectorUtils.openPhoto(ChatActivity.this, REQUEST_PHOTO,true,0);
                         break;
                     case R.id.mCameraBtn:
+                        startActivityForResult(new Intent(ChatActivity.this, CameraActivity.class),REQUEST_CAMERA);
                         break;
                     case R.id.mCallBtn:
                         break;

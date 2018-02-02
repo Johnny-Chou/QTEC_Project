@@ -40,6 +40,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
     public static final int MODE_NONE = 2;
     public static final int MODE_HOME = 3;
 
+    public void setNeedScaleView(boolean needScaleView) {
+        this.needScaleView = needScaleView;
+    }
+
+    private boolean needScaleView = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +66,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
                 setUpData(savedInstanceState);
                 break;
         }
-        scaleView();
+        if (needScaleView) {
+            scaleView();
+        }
     }
 
     private void scaleView() {
@@ -89,7 +97,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
         intent.putExtra(ConstantValues.KEY_HOME_ACTION, ConstantValues.ACTION_KICK_OUT);
         startActivity(intent);
     }
-
 
 
     @Override
