@@ -5,13 +5,16 @@ package com.im.qtec.utils;
  */
 
 public class UrlHelper {
-    public static String LOGIN_URL = "http://192.168.91.137:8080/talkserver/login.do";
-    public static String CHECK_LOGIN_URL = "http://192.168.91.137:8080/talkserver/checkvalid.do";
-    public static String INFO_DETAIL = "http://192.168.91.137:8080/talkserver//detail.do";
-    public static String GET_CONTACTS = "http://192.168.91.137:8080/talkserver//contact.do";
-    public static String GET_TOPIC = "http://localhost:8080/talkserver/getConfig.do";
-    public static String GET_KEY = "http://192.168.91.137:8080/talkserver/valid.do";
-    public static String UPLOAD_FILE = "http://192.168.91.137:8080/talkserver/uploadConfig.do";
-    public static String LOGOUT_URL = "http://192.168.91.137:8080/talkserver/logout.do";
-    public static String UPDATE_PASSWORD = "http://192.168.91.137:8080/talkserver/updatePasswd.do";
+    public static String BASE_IP = "192.168.91.137:8080";
+    public static String MQTT_IP = "192.168.91.137:1883";
+    public static String BASE_URL = "http://" + BASE_IP;
+    public static String LOGIN_URL = BASE_URL + "/talkserver/login.do";
+    public static String CHECK_LOGIN_URL = BASE_URL +"/talkserver/checkvalid.do";
+    public static String INFO_DETAIL = BASE_URL +"/talkserver//detail.do";
+    public static String GET_CONTACTS = BASE_URL +"/talkserver//contact.do";
+    public static String GET_TOPIC = BASE_URL +"/talkserver/getConfig.do";
+    public static String GET_KEY = BASE_URL +"/talkserver/valid.do";
+    public static String UPLOAD_FILE = BASE_URL +"/talkserver/uploadConfig.do";
+    public static String LOGOUT_URL = BASE_URL +"/talkserver/logout.do";
+    public static String UPDATE_PASSWORD = BASE_URL +"/talkserver/updatePasswd.do";
 }

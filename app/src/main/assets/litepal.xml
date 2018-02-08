@@ -2,11 +2,12 @@
 <litepal>
     <dbname value="im" ></dbname>
 
-    <version value="5" ></version>
+    <version value="8" ></version>
 
     <list>
         <mapping class="com.im.qtec.db.Contact"></mapping>
         <mapping class="com.im.qtec.db.Chat"></mapping>
         <mapping class="com.im.qtec.db.Conversation"></mapping>
+        <mapping class="com.im.qtec.db.LastChatTime"></mapping>
     </list>
 </litepal>

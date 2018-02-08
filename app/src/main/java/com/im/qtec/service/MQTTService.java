@@ -11,11 +11,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.im.qtec.activity.MainActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.db.Chat;
 import com.im.qtec.db.Contact;
@@ -24,6 +22,7 @@ import com.im.qtec.event.MessageEvent;
 import com.im.qtec.utils.HttpEngin;
 import com.im.qtec.utils.MessageUtils;
 import com.im.qtec.utils.SPUtils;
+import com.im.qtec.utils.UrlHelper;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -51,7 +50,7 @@ public class MQTTService extends Service {
 
     private static MqttAndroidClient client;
     private MqttConnectOptions conOpt;
-    private String host = "tcp://192.168.91.137:1883";
+    private String host = "tcp://" + UrlHelper.MQTT_IP;
     private String userName;
     private String passWord = "password";
     private static String myTopic;
@@ -69,7 +68,7 @@ public class MQTTService extends Service {
 
     public void publish(byte[] msg, int userid) {
         String topic = "single/" + userid + "/" + myid;
-        Integer qos = 0;
+        Integer qos = 1;
         Boolean retained = false;
         try {
             client.publish(topic, msg, qos.intValue(), retained.booleanValue());
@@ -82,13 +81,14 @@ public class MQTTService extends Service {
 
     public void publish(byte[] yourMsg, int userid, byte[] myMsg) {
         String topic = "single/" + userid + "/" + myid;
-        Integer qos = 0;
+        Integer qos = 1;
         Boolean retained = false;
         try {
             if (yourMsg != null) {
                 client.publish(topic, yourMsg, qos.intValue(), retained.booleanValue());
             }
             if (myMsg != null) {
+                final String path = new String(MessageUtils.getMessageContent(myMsg));
                 saveMessage(myMsg, 1, userid);
                 EventBus.getDefault().post(new MessageEvent());
             }
@@ -121,7 +121,7 @@ public class MQTTService extends Service {
         boolean doConnect = true;
         String message = "{\"terminal_uid\":\"" + clientId + "\"}";
         String topic = "single/" + myid;
-        Integer qos = 0;
+        Integer qos = 1;
         Boolean retained = false;
         if ((!message.equals("")) || (!topic.equals(""))) {
             // 最后的遗嘱
@@ -190,9 +190,12 @@ public class MQTTService extends Service {
         }
     };
 
-    private String generateFileName() {
-        return UUID.randomUUID().toString() + ".amr";
-    }
+    /*private String generateFileName(String url) {
+        String[] split = url.split(".");
+        String suffix = split[split.length - 1];
+        return UUID.randomUUID().toString() + "." + suffix;
+    }*/
+    
 
     // MQTT监听并且接受消息
     private MqttCallback mqttCallback = new MqttCallback() {
@@ -207,19 +210,19 @@ public class MQTTService extends Service {
                 int lastIndex = topic.lastIndexOf("/");
                 String userid = topic.substring(lastIndex + 1);
                 final int uid = Integer.valueOf(userid);
-
                 final byte[] payload = message.getPayload();
-                if (MessageUtils.getMessageType(payload) == CHAT_TYPE_VOICE) {
-                    String voiceUrl = new String(MessageUtils.getMessageContent(payload));
-                    HttpEngin.getInstance().getFile(voiceUrl, getFilesDir().getAbsolutePath(), generateFileName(), new HttpEngin.FileLoadListener<String>() {
+                MessageUtils.setTime(payload,System.currentTimeMillis()/1000);
+                if (MessageUtils.getMessageType(payload) != CHAT_TYPE_MESSAGE) {
+                    String fileUrl = new String(MessageUtils.getMessageContent(payload));
+                    String suffix = fileUrl.substring(fileUrl.lastIndexOf("."));
+                    HttpEngin.getInstance().getFile(fileUrl, getFilesDir().getAbsolutePath(), UUID.randomUUID()+suffix, new HttpEngin.FileLoadListener<String>() {
                         @Override
                         public void inProgress(float progress, long total, int id) {
-
                         }
 
                         @Override
                         public void onError(Call call, Exception e, int id) {
-                            ToastUtils.showLong("接收语音失败");
+                            ToastUtils.showLong("接收失败");
                         }
 
                         @Override
@@ -301,7 +304,7 @@ public class MQTTService extends Service {
             publish(msg, userid);
         }
 
-        public void publishVoice(byte[] yourMsg, int userid, byte[] myMsg) {
+        public void publishFile(byte[] yourMsg, int userid, byte[] myMsg) {
             publish(yourMsg, userid, myMsg);
         }
 

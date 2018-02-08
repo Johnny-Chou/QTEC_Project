@@ -8,6 +8,7 @@ import org.litepal.crud.DataSupport;
 
 public class Conversation extends DataSupport{
     private int uid;
+    private int unreadnumber;
     private byte[] lastMessage;
 
     public int getUid() {
@@ -26,4 +27,11 @@ public class Conversation extends DataSupport{
         this.lastMessage = lastMessage;
     }
 
+    public int getUnreadnumber() {
+        return unreadnumber;
+    }
+
+    public void setUnreadnumber(int unreadnumber) {
+        this.unreadnumber = unreadnumber;
+    }
 }

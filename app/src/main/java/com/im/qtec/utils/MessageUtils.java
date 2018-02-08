@@ -106,8 +106,8 @@ public class MessageUtils {
     public static String getMessage(byte[] message) {
         byte[] plain = new byte[]{0};
         try {
-            plain = EncryptUtils.decryptAES(getMessageContent(message), getMessageKey(message));
-            //plain = getMessageContent(message);
+            //plain = EncryptUtils.decryptAES(getMessageContent(message), getMessageKey(message));
+            plain = getMessageContent(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -120,8 +120,8 @@ public class MessageUtils {
         byte[] receiver = intToBytes(receiverid);
         byte[] time = intToBytes(timestamp);
         try {
-            byte[] encryptContent = EncryptUtils.encryptAES(messageContent, key);
-            byte[] message = new byte[headerLength + encryptContent.length];
+            //byte[] encryptContent = EncryptUtils.encryptAES(messageContent, key);
+            byte[] message = new byte[headerLength + messageContent.length];
             for (int i = 0; i < message.length; i++) {
                 if (i < 2) {
                     message[i] = header[i];
@@ -138,7 +138,7 @@ public class MessageUtils {
                 } else if (i < 32) {
                     message[i] = time[i - 28];
                 }else if (i >= headerLength) {
-                    message[i] = encryptContent[i - headerLength];
+                    message[i] = messageContent[i - headerLength];
                 }
             }
             return message;
@@ -218,5 +218,22 @@ public class MessageUtils {
             newMessage[i - headerLength] = message[i];
         }
         return new String(newMessage);
+    }
+
+    public static int getSenderId(byte[] message) {
+        byte[] senderIdBytes = new byte[]{message[18],message[19],message[20],message[21]};
+        return bytesToInt(senderIdBytes, 0);
+    }
+
+    public static int getReceiverId(byte[] message) {
+        byte[] receiverIdBytes = new byte[]{message[22],message[23],message[24],message[25]};
+        return bytesToInt(receiverIdBytes, 0);
+    }
+
+    public static void setTime(byte[] payload, long l) {
+        byte[] bytes = intToBytes((int) l);
+        for (int i = 0; i < 4; i++) {
+            payload[28+i] = bytes[i];
+        }
     }
 }

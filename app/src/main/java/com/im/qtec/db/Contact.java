@@ -12,27 +12,32 @@ import java.io.Serializable;
  */
 
 public class Contact extends DataSupport implements Comparable<Contact>, Serializable {
+
+
     /**
-     * uid : 207
-     * username : 李震宇
+     * id : 245
+     * username : 7
      * password :
-     * email : lizhenyu@qtec.cn
-     * sex : 1
-     * status : 0
-     * createTime : 1510829914000
-     * updateTime : 1510829914000
-     * telephone : 0571-86336999
-     * mobilephone : 18606719629
+     * email : 7@qq.com
+     * sex : 9
+     * status : 1
+     * createTime : 1512462783000
+     * updateTime : 1512462783000
+     * telephone :
+     * mobilephone : 15738857507
      * deviceId :
+     * deviceToken :
+     * voipToken :
      * role : 2
-     * company : 九州量子
-     * apartment : 研发部
+     * company :
+     * apartment :
      * level : 员工
-     * online : 1
-     * logo : http://192.168.90.79:8080/image/1511355804271.jpg
+     * online : 0
+     * logo : http://192.168.90.79:8080/image/1512462783158.jpg
+     * uid : 245
      */
 
-    private int uid;
+    private int id;
     private String username;
     private String password;
     private String email;
@@ -43,19 +48,33 @@ public class Contact extends DataSupport implements Comparable<Contact>, Seriali
     private String telephone;
     private String mobilephone;
     private String deviceId;
+    private String deviceToken;
+    private String voipToken;
     private int role;
     private String company;
     private String apartment;
     private String level;
     private int online;
     private String logo;
+    private int uid;
 
-    public int getUid() {
-        return uid;
+    @Override
+    public int compareTo(Contact another) {
+        String pinyin = PinYinUtil.getPinyin(username);
+        if (PinYinUtil.getFirstLetter(this) == '#' && PinYinUtil.getFirstLetter(another) != '#') {
+            return 1;
+        } else if (PinYinUtil.getFirstLetter(this) != '#' && PinYinUtil.getFirstLetter(another) == '#') {
+            return -1;
+        }
+        return pinyin.toUpperCase().compareTo(PinYinUtil.getPinyin(another.getUsername().toUpperCase()));
     }
 
-    public void setUid(int id) {
-        this.uid = id;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -138,6 +157,22 @@ public class Contact extends DataSupport implements Comparable<Contact>, Seriali
         this.deviceId = deviceId;
     }
 
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
+    public String getVoipToken() {
+        return voipToken;
+    }
+
+    public void setVoipToken(String voipToken) {
+        this.voipToken = voipToken;
+    }
+
     public int getRole() {
         return role;
     }
@@ -186,15 +221,11 @@ public class Contact extends DataSupport implements Comparable<Contact>, Seriali
         this.logo = logo;
     }
 
+    public int getUid() {
+        return uid;
+    }
 
-    @Override
-    public int compareTo(Contact another) {
-        String pinyin = PinYinUtil.getPinyin(username);
-        if (PinYinUtil.getFirstLetter(this) == '#' && PinYinUtil.getFirstLetter(another) != '#') {
-            return 1;
-        } else if (PinYinUtil.getFirstLetter(this) != '#' && PinYinUtil.getFirstLetter(another) == '#') {
-            return -1;
-        }
-        return pinyin.toUpperCase().compareTo(PinYinUtil.getPinyin(another.getUsername().toUpperCase()));
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

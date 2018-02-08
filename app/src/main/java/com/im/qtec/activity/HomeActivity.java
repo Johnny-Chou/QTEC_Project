@@ -15,6 +15,8 @@ import com.im.qtec.core.BaseFragment;
 import com.im.qtec.entity.Info;
 import com.im.qtec.entity.KeyRequestEntity;
 import com.im.qtec.entity.KeyResultEntity;
+import com.im.qtec.event.MessageEvent;
+import com.im.qtec.event.UnreadnumberEvent;
 import com.im.qtec.fragment.CallFragment;
 import com.im.qtec.fragment.ContactsFragment;
 import com.im.qtec.fragment.ConversationFragment;
@@ -24,6 +26,10 @@ import com.im.qtec.utils.HttpEngin;
 import com.im.qtec.utils.SPUtils;
 import com.im.qtec.utils.UrlHelper;
 import com.im.qtec.widget.TabLayout;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -52,6 +58,7 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
         startMqttService();
         initTabs();
         getKeys();
+        EventBus.getDefault().register(this);
     }
 
     private void startMqttService() {
@@ -159,5 +166,16 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
     @Override
     protected void kickOut() {
         reLogin();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void getUnreadnumber(UnreadnumberEvent event) {
+        mTabLayout.onDataChanged(0,event.unreadnumber);
     }
 }

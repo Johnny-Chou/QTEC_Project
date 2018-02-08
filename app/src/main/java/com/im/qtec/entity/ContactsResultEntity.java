@@ -12,37 +12,42 @@ public class ContactsResultEntity {
 
 
     /**
-     * flag :
-     * errCode :
-     * resData : [{"id":207,"username":"李震宇","password":"","email":"lizhenyu@qtec.cn","sex":1,"status":0,"createTime":1510829914000,"updateTime":1510829914000,"telephone":"0571-86336999","mobilephone":"18606719629","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":208,"username":"李震宇1","password":"","email":"lizhenyu1@qtec.cn","sex":1,"status":0,"createTime":1510830194000,"updateTime":1510830194000,"telephone":"0571-86336999","mobilephone":"18606719620","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":209,"username":"李震宇2","password":"","email":"lizhenyu2@qtec.cn","sex":1,"status":0,"createTime":1510830321000,"updateTime":1510830321000,"telephone":"0571-86336999","mobilephone":"18606719622","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":210,"username":"李震宇3","password":"","email":"lizhenyu3@qtec.cn","sex":1,"status":0,"createTime":1510830330000,"updateTime":1510830330000,"telephone":"0571-86336999","mobilephone":"18606719623","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":211,"username":"李震宇4","password":"","email":"lizhenyu4@qtec.cn","sex":1,"status":0,"createTime":1510830337000,"updateTime":1510830337000,"telephone":"0571-86336999","mobilephone":"18606719624","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":212,"username":"李震宇5","password":"","email":"lizhenyu5@qtec.cn","sex":1,"status":0,"createTime":1510830346000,"updateTime":1510830346000,"telephone":"0571-86336999","mobilephone":"18606719625","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":213,"username":"李震宇6","password":"","email":"lizhenyu6@qtec.cn","sex":1,"status":0,"createTime":1510830356000,"updateTime":1510830356000,"telephone":"0571-86336999","mobilephone":"18606719626","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":214,"username":"李震宇7","password":"","email":"lizhenyu7@qtec.cn","sex":1,"status":0,"createTime":1510830365000,"updateTime":1510830365000,"telephone":"0571-86336999","mobilephone":"18606719627","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"},{"id":215,"username":"李震宇8","password":"","email":"lizhenyu8@qtec.cn","sex":1,"status":0,"createTime":1510830374000,"updateTime":1510830374000,"telephone":"0571-86336999","mobilephone":"18606719628","deviceId":"","role":2,"company":"九州量子","apartment":"研发部","level":"员工","online":1,"logo":"http://192.168.90.79:8080/image/1511355804271.jpg"}]
+     * resData : {"versionData":"2018-02-06 17:18:48","contact":[{"id":245,"username":"7","password":"","email":"7@qq.com","sex":9,"status":1,"createTime":1512462783000,"updateTime":1512462783000,"telephone":"","mobilephone":"15738857507","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"员工","online":0,"logo":"http://192.168.90.79:8080/image/1512462783158.jpg","uid":245},{"id":246,"username":"8","password":"","email":"8@qq.com","sex":9,"status":1,"createTime":1512462791000,"updateTime":1512462791000,"telephone":"","mobilephone":"15738857508","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"员工","online":0,"logo":"http://192.168.90.79:8080/image/1512462791414.jpg","uid":246},{"id":300,"username":"qwqsqws","password":"","email":"158888@qq.com","sex":1,"status":1,"createTime":1517453449000,"updateTime":1517453449000,"telephone":"","mobilephone":"13785552222","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"","online":0,"logo":"","uid":300}]}
      */
 
-    private boolean flag;
-    private String errCode;
-    private List<Contact> resData;
+    private ResDataBean resData;
 
-    public boolean getFlag() {
-        return flag;
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
-    }
-
-    public String getErrCode() {
-        return errCode;
-    }
-
-    public void setErrCode(String errCode) {
-        this.errCode = errCode;
-    }
-
-    public List<Contact> getResData() {
+    public ResDataBean getResData() {
         return resData;
     }
 
-    public void setResData(List<Contact> resData) {
+    public void setResData(ResDataBean resData) {
         this.resData = resData;
     }
 
+    public static class ResDataBean {
+        /**
+         * versionData : 2018-02-06 17:18:48
+         * contact : [{"id":245,"username":"7","password":"","email":"7@qq.com","sex":9,"status":1,"createTime":1512462783000,"updateTime":1512462783000,"telephone":"","mobilephone":"15738857507","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"员工","online":0,"logo":"http://192.168.90.79:8080/image/1512462783158.jpg","uid":245},{"id":246,"username":"8","password":"","email":"8@qq.com","sex":9,"status":1,"createTime":1512462791000,"updateTime":1512462791000,"telephone":"","mobilephone":"15738857508","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"员工","online":0,"logo":"http://192.168.90.79:8080/image/1512462791414.jpg","uid":246},{"id":300,"username":"qwqsqws","password":"","email":"158888@qq.com","sex":1,"status":1,"createTime":1517453449000,"updateTime":1517453449000,"telephone":"","mobilephone":"13785552222","deviceId":"","deviceToken":"","voipToken":"","role":2,"company":"","apartment":"","level":"","online":0,"logo":"","uid":300}]
+         */
+
+        private String versionData;
+        private List<Contact> contact;
+
+        public String getVersionData() {
+            return versionData;
+        }
+
+        public void setVersionData(String versionData) {
+            this.versionData = versionData;
+        }
+
+        public List<Contact> getContact() {
+            return contact;
+        }
+
+        public void setContact(List<Contact> contact) {
+            this.contact = contact;
+        }
+    }
 }

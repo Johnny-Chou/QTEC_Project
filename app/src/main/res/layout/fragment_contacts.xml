@@ -39,6 +39,16 @@
             android:layout_marginTop="54px"
             android:layout_marginBottom="18px"/>
 
+        <TextView
+            android:id="@+id/mFirstLetterView"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:background="@color/gray_text"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:textSize="36px"/>
 
     </RelativeLayout>
 

@@ -43,12 +43,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical"
                 android:textSize="15px" />
 
             <ImageView
                 android:id="@+id/mPictureView"
                 android:layout_width="75px"
                 android:layout_height="145px"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
                 android:visibility="gone" />
 
             <View

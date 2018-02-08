@@ -18,25 +18,34 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.TimeUtils;
+import com.google.gson.Gson;
 import com.im.qtec.R;
 import com.im.qtec.activity.ChatActivity;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.core.BaseFragment;
+import com.im.qtec.db.Chat;
 import com.im.qtec.db.Contact;
 import com.im.qtec.db.Conversation;
+import com.im.qtec.db.LastChatTime;
+import com.im.qtec.entity.Info;
 import com.im.qtec.event.MessageEvent;
+import com.im.qtec.event.UnreadnumberEvent;
 import com.im.qtec.utils.EmoParser;
 import com.im.qtec.utils.MessageUtils;
 import com.im.qtec.utils.RecycleViewDivider;
+import com.im.qtec.utils.SPUtils;
 import com.im.qtec.utils.SupportMultipleScreensUtil;
 import com.im.qtec.widget.PortraitView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.litepal.crud.ClusterQuery;
 import org.litepal.crud.DataSupport;
+import org.litepal.crud.callback.FindMultiCallback;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,8 +66,9 @@ public class ConversationFragment extends BaseFragment {
     @Bind(R.id.mConversationRv)
     RecyclerView mConversationRv;
 
-    private List<Conversation> conversationList;
+    private List<Conversation> conversationList = new ArrayList<>();
     private ConversationFragment.conversationAdapter conversationAdapter;
+    private Info userinfo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,18 +85,70 @@ public class ConversationFragment extends BaseFragment {
 
     @Override
     public void setUpData() {
+        userinfo = new Gson().fromJson(SPUtils.getString(getActivity(), ConstantValues.USER_INFO, ""), Info.class);
         initSearch();
         initConversationList();
     }
 
     private void initConversationList() {
-        conversationList = DataSupport.findAll(Conversation.class);
-        sortConversationList();
+        //conversationList = DataSupport.findAll(Conversation.class);
         mConversationRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mConversationRv.addItemDecoration(new RecycleViewDivider(getActivity(), LinearLayoutManager.HORIZONTAL));
         conversationAdapter = new conversationAdapter();
         mConversationRv.setAdapter(conversationAdapter);
+        pickConversation();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        pickConversation();
+    }
+
+    private void pickConversation() {
+        conversationList = new ArrayList<>();
+        List<Conversation> allConversations = DataSupport.findAll(Conversation.class);
+        for (int i = 0; i < allConversations.size(); i++) {
+            int unreadnumber = 0;
+            final Conversation conversation = allConversations.get(i);
+            byte[] message = conversation.getLastMessage();
+            int senderid = MessageUtils.getSenderid(message);
+            int receiverid = MessageUtils.getReceiverid(message);
+            long timestamp = 0;
+            List<LastChatTime> lastChatTimes = DataSupport.where("myid = ? and yourid = ?", userinfo.getResData().getId() + "", conversation.getUid() + "").find(LastChatTime.class);
+            if (lastChatTimes != null && lastChatTimes.size() > 0) {
+                timestamp = lastChatTimes.get(0).getTimestamp();
+            }
+            if (senderid == userinfo.getResData().getId() || receiverid == userinfo.getResData().getId()) {
+                final long finalTimestamp = timestamp;
+                List<Chat> chatList = DataSupport.where("uid = ?", conversation.getUid() + "").find(Chat.class);
+                for (int j = 0; j < chatList.size(); j++) {
+                    Chat chat = chatList.get(j);
+                    byte[] chatMessage = chat.getMessage();
+                    int senderId = MessageUtils.getSenderid(chatMessage);
+                    int receiverId = MessageUtils.getReceiverid(chatMessage);
+                    if (senderId == userinfo.getResData().getId() || receiverId == userinfo.getResData().getId()) {
+                        if (MessageUtils.getTime(chatMessage) > finalTimestamp/1000) {
+                            unreadnumber++;
+                        }
+                    }
+                }
+                conversation.setUnreadnumber(unreadnumber);
+                conversation.save();
+            }
+            conversationList.add(conversation);
+        }
+        int totalUnreadnumber = 0;
+        for (int i = 0; i < conversationList.size(); i++) {
+            Conversation conversation = conversationList.get(i);
+            int unreadnumber = conversation.getUnreadnumber();
+            totalUnreadnumber += unreadnumber;
+        }
+        EventBus.getDefault().postSticky(new UnreadnumberEvent(totalUnreadnumber));
+        conversationAdapter.notifyDataSetChanged();
+        sortConversationList();
+    }
+
 
     private void sortConversationList() {
         Collections.sort(conversationList, new Comparator<Conversation>() {
@@ -183,10 +245,18 @@ public class ConversationFragment extends BaseFragment {
                         mPortraitView.setPortrait(getActivity(), contact.getLogo(), contact.getUsername());
                     }
                     mTvName.setText(contact.getUsername());
+                    if (conversation.getUnreadnumber() > 0) {
+                        mBadgeLabel.setVisibility(View.VISIBLE);
+                        mBadgeLabel.setText(conversation.getUnreadnumber()+"");
+                    } else {
+                        mBadgeLabel.setVisibility(View.GONE);
+                    }
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM月dd日 HH:mm:ss", Locale.getDefault());
                     mTvTime.setText(TimeUtils.millis2String((long) MessageUtils.getTime(conversation.getLastMessage()) * 1000, simpleDateFormat));
                     if (MessageUtils.getMessageType(conversation.getLastMessage()) == 3) {
                         mTvContent.setText("[语音]");
+                    } else if (MessageUtils.getMessageType(conversation.getLastMessage()) == 2) {
+                        mTvContent.setText("[图片]");
                     } else {
                         mTvContent.setText(EmoParser.parseEmo(getActivity(), MessageUtils.getMessage(conversation.getLastMessage()), 20));
                     }
@@ -211,8 +281,7 @@ public class ConversationFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void getMqttMessage(MessageEvent event) {
-        conversationList = DataSupport.findAll(Conversation.class);
-        sortConversationList();
+        pickConversation();
         conversationAdapter.notifyDataSetChanged();
     }
 }

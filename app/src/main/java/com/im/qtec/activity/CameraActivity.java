@@ -1,5 +1,6 @@
 package com.im.qtec.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.cjt2325.cameralibrary.listener.ErrorListener;
 import com.cjt2325.cameralibrary.listener.JCameraListener;
 import com.im.qtec.R;
 import com.im.qtec.core.BaseActivity;
+import com.im.qtec.utils.ImageUtil;
 
 /**
  * Created by zhouyanglei on 2018/2/1.
@@ -21,6 +23,8 @@ import com.im.qtec.core.BaseActivity;
 
 public class CameraActivity extends BaseActivity {
     private JCameraView mJCameraView;
+    private static final int REQUEST_CAMERA = 200;
+    private static final String PICTURE_PATH = "picture_path";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,6 +72,11 @@ public class CameraActivity extends BaseActivity {
             public void captureSuccess(Bitmap bitmap) {
 //获取图片bitmap
                 Log.i("JCameraView", "bitmap = " + bitmap.getWidth());
+                String imagePath = ImageUtil.saveImageToGallery(CameraActivity.this, bitmap);
+                Intent data = new Intent();
+                data.putExtra(PICTURE_PATH,imagePath);
+                setResult(REQUEST_CAMERA,data);
+                finish();
             }
 
             @Override

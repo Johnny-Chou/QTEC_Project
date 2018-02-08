@@ -1,9 +1,9 @@
 package com.im.qtec.fragment;
 
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,7 +46,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import okhttp3.Call;
 
 /**
@@ -60,10 +59,13 @@ public class ContactsFragment extends BaseFragment implements HttpEngin.HttpList
     RecyclerView mFriendsView;
     @Bind(R.id.mQuickIndex)
     QuickIndexBar mQuickIndex;
+    @Bind(R.id.mFirstLetterView)
+    TextView mFirstLetterView;
 
     private List<Contact> contacts;
     private String lastUpdateTime;
     private ContactsAdapter contactsAdapter;
+    private LinearLayoutManager linearLayoutManager;
 
     @Nullable
     @Override
@@ -83,7 +85,8 @@ public class ContactsFragment extends BaseFragment implements HttpEngin.HttpList
         contacts = DataSupport.findAll(Contact.class);
         contactsAdapter = new ContactsAdapter();
         Collections.sort(contacts);
-        mFriendsView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        mFriendsView.setLayoutManager(linearLayoutManager);
         mFriendsView.addItemDecoration(new RecycleViewDivider(getActivity(), LinearLayoutManager.HORIZONTAL));
         mFriendsView.setAdapter(contactsAdapter);
         initSearch();
@@ -115,15 +118,35 @@ public class ContactsFragment extends BaseFragment implements HttpEngin.HttpList
                     String firstWord = PinYinUtil.getFirstLetter(contacts.get(i)) + "";
                     if (firstWord.equalsIgnoreCase(letter)) {
                         //说明找到了和letter同样字母的条目
-                        //mFriendsView.smoothScrollToPosition();
+                        //mFriendsView.smoothScrollToPosition(i);
+                        linearLayoutManager.scrollToPositionWithOffset(i+1,0);
                         //找到立即中断
                         break;
                     }
                 }
-
+                //显示出字母
+                showLetter(letter);
             }
         });
     }
+
+    private Handler handler = new Handler();
+
+    private void showLetter(String letter) {
+        //一开始就先移除之前的任务
+        handler.removeCallbacksAndMessages(null);
+
+        mFirstLetterView.setText(letter);
+        mFirstLetterView.setVisibility(View.VISIBLE);
+        //延时隐藏
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mFirstLetterView.setVisibility(View.GONE);
+            }
+        }, 2000);
+    }
+
 
     private void initSearch() {
         mEtSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -154,15 +177,14 @@ public class ContactsFragment extends BaseFragment implements HttpEngin.HttpList
     public void onResponse(ContactsResultEntity result, int id) {
         String updateTime = TimeUtils.millis2String(System.currentTimeMillis());
         SPUtils.saveString(getActivity(), ConstantValues.UPDATED_TIME, updateTime);
-        if (result.getFlag()) {
-            if (!contacts.contains(result.getResData())) {
-                DataSupport.saveAll(result.getResData());
-                contacts.addAll(result.getResData());
-                Collections.sort(contacts);
-                if (result.getResData() != null && result.getResData().size() != 0) {
-                    contactsAdapter.notifyDataSetChanged();
-                }
+        if (!contacts.contains(result.getResData())) {
+            DataSupport.saveAll(result.getResData().getContact());
+            contacts.addAll(result.getResData().getContact());
+            Collections.sort(contacts);
+            if (result.getResData() != null && result.getResData().getContact().size() != 0) {
+                contactsAdapter.notifyDataSetChanged();
             }
+
 //            mFriendsView.setAdapter(contactsAdapter);
         } else {
             ToastUtils.showLong("获取好友列表失败，请重试");

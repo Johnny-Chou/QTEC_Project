@@ -2,12 +2,14 @@ package com.im.qtec.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +30,7 @@ import com.im.qtec.entity.Info;
 import com.im.qtec.entity.KeyRequestEntity;
 import com.im.qtec.entity.User;
 import com.im.qtec.utils.HttpEngin;
+import com.im.qtec.utils.KeyboardChangeListener;
 import com.im.qtec.utils.SPUtils;
 import com.im.qtec.utils.UrlHelper;
 
@@ -45,7 +48,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     private ProgressBar mProgressBar;
     private String username;
     private String password;
-
+    private boolean hasSaved = false;
 
 
     @Override
@@ -65,16 +68,22 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                if (!hasSaved) {
+                    Rect r = new Rect();
+                    getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+                    int screenHeight = getWindow().getDecorView().getRootView().getHeight();
+                    Resources resources=getResources();
+                    DisplayMetrics displayMetrics = resources.getDisplayMetrics();
+                    screenHeight = displayMetrics.heightPixels;
+                    int softInputHeight = screenHeight - r.bottom;
+                    SPUtils.saveInt(LoginActivity.this, ConstantValues.KEYBOARD_HEIGHT, softInputHeight);
+                    hasSaved = true;
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                Rect r = new Rect();
-                getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
-                int screenHeight = getWindow().getDecorView().getRootView().getHeight();
-                int softInputHeight = screenHeight - r.bottom;
-                SPUtils.saveInt(LoginActivity.this, ConstantValues.KEYBOARD_HEIGHT,softInputHeight);
+
             }
         });
         mBtLogin = findViewById(R.id.mBtLogin);
@@ -85,18 +94,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
     protected void setUpData(Bundle savedInstanceState) {
         mBtLogin.setOnClickListener(this);
         int kickOut = getIntent().getIntExtra(ConstantValues.KEY_HOME_ACTION, -1);
-        if (kickOut == ConstantValues.ACTION_KICK_OUT){
+        if (kickOut == ConstantValues.ACTION_KICK_OUT) {
             new AlertDialog.Builder(this)
                     .setTitle("注意")
                     .setMessage("登陆失效，请重新登陆")
-                    .setPositiveButton("确定",null).show();
+                    .setPositiveButton("确定", null).show();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        BarUtils.setStatusBarAlpha(this,0);
+        BarUtils.setStatusBarAlpha(this, 0);
     }
 
     @Override
@@ -109,7 +118,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener,
             mProgressBar.setVisibility(View.VISIBLE);
             HttpEngin.getInstance().post(UrlHelper.LOGIN_URL,
                     new User(username, EncryptUtils.encryptMD5ToString(password), DeviceUtils.getAndroidID()),
-                    Info.class,this);
+                    Info.class, this);
 
         }
     }

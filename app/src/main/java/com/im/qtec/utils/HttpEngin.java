@@ -61,8 +61,9 @@ public class HttpEngin<T> {
     }
 
     public void postFile(String url, File file, final Class<T> clazz, final FileLoadListener<T> fileLoadListener) {
-        OkHttpUtils.post()//
-                .addFile("mFile", UUID.randomUUID() + ".amr", file)//
+        String[] split = file.getAbsolutePath().split("/");
+        OkHttpUtils.post()
+                .addFile("mFile", split[split.length - 1], file)//
                 //.addFile("mFile", "test1.txt", file2)//
                 .url(url)
                 .params(null)//

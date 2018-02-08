@@ -14,6 +14,9 @@
         android:visibility="gone"
         android:layout_width="15px"
         android:layout_height="15px"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="10px"
         android:layout_toRightOf="@id/mTabImg"
         android:background="@drawable/shape_badge" />
 
