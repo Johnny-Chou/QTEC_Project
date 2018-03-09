@@ -74,6 +74,13 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.qtec.qkcl.crypto.enums.EEncrypAlg;
+import cn.qtec.qkcl.envelope.EnvelopEnc;
+import cn.qtec.qkcl.envelope.EnvelopEncInterface;
+import cn.qtec.qkcl.envelope.future.StopableFuture;
+import cn.qtec.qkcl.envelope.pojo.QtKey;
+import cn.qtec.qkcl.envelope.pojo.QtKeyId;
+import cn.qtec.qkcl.envelope.pojo.QtRecipientInfo;
 import okhttp3.Call;
 
 
@@ -196,42 +203,97 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         mAudioRecordBtn.setAudioFinishRecorderListener(new AudioRecorderButton.AudioFinishRecorderListener() {
             @Override
             public void onFinish(final float seconds, final String filePath) {
-                sendVoice(seconds, null, filePath);
-                HttpEngin.getInstance().postFile(UrlHelper.UPLOAD_FILE + "?id=" + userinfo.getResData().getId() + "&deviceId=" + DeviceUtils.getAndroidID(),
-                        new File(filePath), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
-                            @Override
-                            public void inProgress(float progress, long total, int id) {
-
-                            }
-
+                HttpEngin.getInstance().post(UrlHelper.GET_CODE,
+                        new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID()),
+                        KeyResultEntity.class, new HttpEngin.HttpListener<KeyResultEntity>() {
                             @Override
                             public void onError(Call call, Exception e, int id) {
-                                e.printStackTrace();
+                                ToastUtils.showLong("获取密钥失败，请重试");
                             }
 
                             @Override
-                            public void onResponse(FileUploadResultEntity entity, int id) {
-                                if (entity.isFlag()) {
-                                    sendVoice(seconds, entity.getResData(), null);
+                            public void onResponse(KeyResultEntity resultEntity, int id) {
+                                if (resultEntity.isFlag()) {
+                                    String keyId = resultEntity.getResData().getId();
+                                    String key = resultEntity.getResData().getValue();
+                                    String encryptPath = encryptFile(keyId, key, filePath);
+                                    sendVoice(seconds, null, filePath, keyId);
+                                    HttpEngin.getInstance().postFile(UrlHelper.UPLOAD_FILE + "?id=" + userinfo.getResData().getId() + "&deviceId=" + DeviceUtils.getAndroidID(),
+                                            new File(encryptPath), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
+                                                @Override
+                                                public void inProgress(float progress, long total, int id) {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Call call, Exception e, int id) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                @Override
+                                                public void onResponse(FileUploadResultEntity entity, int id) {
+                                                    if (entity.isFlag()) {
+                                                        sendVoice(seconds, entity.getResData(), null, keyId);
+                                                    }
+                                                }
+                                            });
                                 }
                             }
                         });
-
             }
         });
     }
 
-    private void sendVoice(float seconds, String yourPath, String myPath) {
-        String key = "0000111122223333";
+    private String encryptFile(String keyId, String key, String filePath) {
+        EnvelopEncInterface envelopEnc = EnvelopEnc.getInstance();
+        //模拟创建接收者信息
+        List<QtRecipientInfo> list = new ArrayList<>();
+        QtRecipientInfo qtRecipientInfo = new QtRecipientInfo();
+        //设置接收者的算法
+        qtRecipientInfo.seteEncrypAlg(EEncrypAlg.AES256_CBC_PKCS5PADDING);
+        //模拟生成一个接收者的共享密钥
+        QtKey qtKey = new QtKey();
+//        qtKey.randomValue();
+//        qtRecipientInfo.setKey(qtKey);
+        //模拟生成一个接收者的密钥id
+        QtKeyId qtKeyId = new QtKeyId();
+        for (byte i = 0; i < qtKey.getBuffer().length; i++) {
+            qtKey.getBuffer()[i] = key.getBytes()[i];
+        }
+        for (byte i = 0; i < qtKeyId.getBuffer().length; i++) {
+            qtKeyId.getBuffer()[i] = keyId.getBytes()[i];
+        }
+        qtRecipientInfo.setKey(qtKey);
+        qtRecipientInfo.setKeyId(qtKeyId);
+        list.add(qtRecipientInfo);
+
+        try {
+            File file = new File(filePath);
+            int lastIndex = filePath.lastIndexOf(".");
+            String suffix = filePath.substring(lastIndex);
+            String encryptPath = filePath.substring(0, lastIndex) + "encrypt" + suffix;
+            StopableFuture future = envelopEnc.encryptFile(file.getAbsolutePath(), list, EEncrypAlg.AES256_CBC_PKCS5PADDING, encryptPath);
+            //在1000毫秒内获取加密结果，如果获取不到结果则返回
+            future.get();
+            //获取加解密结果
+            //future.get();
+            return encryptPath;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private void sendVoice(float seconds, String yourPath, String myPath, String keyId) {
         byte[] yourEncryptedMessage = null;
         byte[] myEncryptedMessage = null;
         if (yourPath != null) {
-            yourEncryptedMessage = MessageUtils.getEncryptedMessage((char) 33, key.getBytes(), userinfo.getResData().getId(),
+            yourEncryptedMessage = MessageUtils.getMessage((char) 53, keyId.getBytes(), userinfo.getResData().getId(),
                     contact.getUid(), (byte) CHAT_TYPE_VOICE, (byte) 0,
                     (int) (System.currentTimeMillis() / 1000), Math.round(seconds), yourPath.getBytes());
         }
         if (myPath != null) {
-            myEncryptedMessage = MessageUtils.getEncryptedMessage((char) 33, key.getBytes(), userinfo.getResData().getId(),
+            myEncryptedMessage = MessageUtils.getMessage((char) 53, keyId.getBytes(), userinfo.getResData().getId(),
                     contact.getUid(), (byte) CHAT_TYPE_VOICE, (byte) 0,
                     (int) (System.currentTimeMillis() / 1000), Math.round(seconds), myPath.getBytes());
         }
@@ -245,10 +307,10 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                 switch (id) {
                     case R.id.mPhotoBtn:
                         //startActivityForResult(new Intent(ChatActivity.this, PhotoActivity.class), REQUEST_PHOTO);选择图片
-                        ImageSelectorUtils.openPhoto(ChatActivity.this, REQUEST_PHOTO,true,0);
+                        ImageSelectorUtils.openPhoto(ChatActivity.this, REQUEST_PHOTO, true, 0);
                         break;
                     case R.id.mCameraBtn:
-                        startActivityForResult(new Intent(ChatActivity.this, CameraActivity.class),REQUEST_CAMERA);
+                        startActivityForResult(new Intent(ChatActivity.this, CameraActivity.class), REQUEST_CAMERA);
                         break;
                     case R.id.mCallBtn:
                         break;
@@ -297,7 +359,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             byte[] message = chat.getMessage();
             int senderid = MessageUtils.getSenderid(message);
             int receiverid = MessageUtils.getReceiverid(message);
-            if (senderid == userinfo.getResData().getId() || receiverid == userinfo.getResData().getId()){
+            if (senderid == userinfo.getResData().getId() || receiverid == userinfo.getResData().getId()) {
                 chatList.add(chat);
             }
         }
@@ -407,6 +469,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
             case R.id.mAddBtn:
                 showMenu();
                 break;
+            default:
         }
     }
 
@@ -486,28 +549,42 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     }
 
     private void sendMessage() {
-        String allKeys = SPUtils.getString(this, ConstantValues.KEYS, "");
-        String key = "";
-        if (allKeys.length() >= 16) {
-            key = allKeys.substring(0, 16);
-            String remainedKeys = allKeys.substring(16);
-            SPUtils.saveString(this, ConstantValues.KEYS, remainedKeys);
-            if (remainedKeys.length() < 10 * 16) {
-                HttpEngin.getInstance().post(UrlHelper.GET_KEY,
-                        new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID(), 50 * 16),
-                        KeyResultEntity.class, this);
-            }
-        } else {
-            key = "0000111122223333";
-            HttpEngin.getInstance().post(UrlHelper.GET_KEY,
-                    new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID(), 50 * 16),
-                    KeyResultEntity.class, this);
-        }
-        byte[] encryptedMessage = MessageUtils.getEncryptedMessage((char) 32, key.getBytes(), userinfo.getResData().getId(),
-                contact.getUid(), (byte) CHAT_TYPE_MESSAGE, (byte) 0,
-                (int) (System.currentTimeMillis() / 1000), mInputEt.getText().toString().getBytes());
-        myBinder.publishMessage(encryptedMessage, contact.getUid());
-        mInputEt.setText("");
+//        String allKeys = SPUtils.getString(this, ConstantValues.KEYS, "");
+//        String key = "";
+//        if (allKeys.length() >= 16) {
+//            key = allKeys.substring(0, 16);
+//            String remainedKeys = allKeys.substring(16);
+//            SPUtils.saveString(this, ConstantValues.KEYS, remainedKeys);
+//            if (remainedKeys.length() < 10 * 16) {
+//                HttpEngin.getInstance().post(UrlHelper.GET_KEY,
+//                        new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID(), 50 * 16),
+//                        KeyResultEntity.class, this);
+//            }
+//        }
+        HttpEngin.getInstance().post(UrlHelper.GET_CODE,
+                new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID()),
+                KeyResultEntity.class, new HttpEngin.HttpListener<KeyResultEntity>() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtils.showLong("获取密钥失败，请重试");
+                    }
+
+                    @Override
+                    public void onResponse(KeyResultEntity resultEntity, int id) {
+                        if (resultEntity.isFlag()) {
+                            String keyId = resultEntity.getResData().getId();
+                            String key = resultEntity.getResData().getValue();
+                            byte[] encryptedMessage = MessageUtils.getEncryptMessage((char) 52, keyId, key.getBytes(), userinfo.getResData().getId(),
+                                    contact.getUid(), (byte) CHAT_TYPE_MESSAGE, (byte) 0,
+                                    (int) (System.currentTimeMillis() / 1000), mInputEt.getText().toString().getBytes());
+                            myBinder.publishMessage(encryptedMessage, contact.getUid());
+                            myBinder.savePlainMessage(MessageUtils.setMessageContent(encryptedMessage, mInputEt.getText().toString().getBytes()), contact.getUid());
+                            mInputEt.setText("");
+                            EventBus.getDefault().post(new MessageEvent());
+                        }
+                    }
+                });
+
     }
 
     @Override
@@ -634,7 +711,8 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
                     mPictureView.setVisibility(View.GONE);
                     mChatTv.setVisibility(View.VISIBLE);
                     mTimeLengthView.setVisibility(View.GONE);
-                    mChatTv.setText(EmoParser.parseEmo(ChatActivity.this, MessageUtils.getMessage(chat.getMessage()), 25));
+                    String messageContent = new String(MessageUtils.getMessageContent(chat.getMessage()));
+                    mChatTv.setText(EmoParser.parseEmo(ChatActivity.this, messageContent, 25));
                     break;
                 case CHAT_TYPE_VOICE:
                     mAnimView.setVisibility(View.VISIBLE);
@@ -748,7 +826,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
     protected void onStop() {
         super.onStop();
         hideMenuView();
-        List<LastChatTime> lastChatTimeList = DataSupport.where("myid = ? and yourid = ?", userinfo.getResData().getId()+"",contact.getUid()+"").find(LastChatTime.class);
+        List<LastChatTime> lastChatTimeList = DataSupport.where("myid = ? and yourid = ?", userinfo.getResData().getId() + "", contact.getUid() + "").find(LastChatTime.class);
         if (lastChatTimeList.size() == 0) {
             LastChatTime lastChatTime = new LastChatTime();
             lastChatTime.setMyid(userinfo.getResData().getId());
@@ -758,7 +836,7 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         } else {
             ContentValues values = new ContentValues();
             values.put("timestamp", System.currentTimeMillis());
-            DataSupport.updateAll(LastChatTime.class, values, "myid = ? and yourid = ?", userinfo.getResData().getId()+"",contact.getUid()+"");
+            DataSupport.updateAll(LastChatTime.class, values, "myid = ? and yourid = ?", userinfo.getResData().getId() + "", contact.getUid() + "");
         }
         EventBus.getDefault().postSticky(new MessageEvent());
     }
@@ -856,46 +934,66 @@ public class ChatActivity extends BaseActivity implements TextWatcher, HttpEngin
         if (requestCode == REQUEST_PHOTO && data != null) {
             //获取选择器返回的数据
             ArrayList<String> images = data.getStringArrayListExtra(ImageSelectorUtils.SELECT_RESULT);
-            if (images != null && images.size() > 0){
-                 path = images.get(0);
+            if (images != null && images.size() > 0) {
+                path = images.get(0);
 
             }
-        }else if (requestCode == REQUEST_CAMERA && data != null){
-             path = data.getStringExtra(PICTURE_PATH);
+        } else if (requestCode == REQUEST_CAMERA && data != null) {
+            path = data.getStringExtra(PICTURE_PATH);
         }
-        sendFile(null,path);
-        HttpEngin.getInstance().postFile(UrlHelper.UPLOAD_FILE + "?id=" + userinfo.getResData().getId() + "&deviceId=" + DeviceUtils.getAndroidID(),
-                new File(path), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
-                    @Override
-                    public void inProgress(float progress, long total, int id) {
 
-                    }
-
+        String finalPath = path;
+        HttpEngin.getInstance().post(UrlHelper.GET_CODE,
+                new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID()),
+                KeyResultEntity.class, new HttpEngin.HttpListener<KeyResultEntity>() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        e.printStackTrace();
+                        ToastUtils.showLong("获取密钥失败，请重试");
                     }
 
                     @Override
-                    public void onResponse(FileUploadResultEntity entity, int id) {
-                        if (entity.isFlag()) {
-                            sendFile(entity.getResData(), null);
+                    public void onResponse(KeyResultEntity resultEntity, int id) {
+                        if (resultEntity.isFlag()) {
+                            String keyId = resultEntity.getResData().getId();
+                            String key = resultEntity.getResData().getValue();
+                            sendFile(null, finalPath, keyId, key);
+
+                            String encryptFile = encryptFile(keyId, key, finalPath);
+                            HttpEngin.getInstance().postFile(UrlHelper.UPLOAD_FILE + "?id=" + userinfo.getResData().getId() + "&deviceId=" + DeviceUtils.getAndroidID(),
+                                    new File(encryptFile), FileUploadResultEntity.class, new HttpEngin.FileLoadListener<FileUploadResultEntity>() {
+                                        @Override
+                                        public void inProgress(float progress, long total, int id) {
+
+                                        }
+
+                                        @Override
+                                        public void onError(Call call, Exception e, int id) {
+                                            e.printStackTrace();
+                                        }
+
+                                        @Override
+                                        public void onResponse(FileUploadResultEntity entity, int id) {
+                                            if (entity.isFlag()) {
+                                                sendFile(entity.getResData(), null, keyId, key);
+                                            }
+                                        }
+                                    });
                         }
                     }
                 });
+
     }
 
-    private void sendFile(String yourPath, String myPath) {
-        String key = "0000111122223333";
+    private void sendFile(String yourPath, String myPath, String keyId, String key) {
         byte[] yourEncryptedMessage = null;
         byte[] myEncryptedMessage = null;
         if (yourPath != null) {
-            yourEncryptedMessage = MessageUtils.getEncryptedMessage((char) 32, key.getBytes(), userinfo.getResData().getId(),
+            yourEncryptedMessage = MessageUtils.getMessage((char) 52, keyId.getBytes(), userinfo.getResData().getId(),
                     contact.getUid(), (byte) CHAT_TYPE_PICTURE, (byte) 0,
                     (int) (System.currentTimeMillis() / 1000), yourPath.getBytes());
         }
         if (myPath != null) {
-            myEncryptedMessage = MessageUtils.getEncryptedMessage((char) 32, key.getBytes(), userinfo.getResData().getId(),
+            myEncryptedMessage = MessageUtils.getMessage((char) 52, keyId.getBytes(), userinfo.getResData().getId(),
                     contact.getUid(), (byte) CHAT_TYPE_PICTURE, (byte) 0,
                     (int) (System.currentTimeMillis() / 1000), myPath.getBytes());
         }

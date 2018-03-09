@@ -119,7 +119,7 @@ public class ConversationFragment extends BaseFragment {
             if (lastChatTimes != null && lastChatTimes.size() > 0) {
                 timestamp = lastChatTimes.get(0).getTimestamp();
             }
-            if (senderid == userinfo.getResData().getId() || receiverid == userinfo.getResData().getId()) {
+            if (senderid == userinfo.getResData().getId() || receiverid ==  userinfo.getResData().getId()) {
                 final long finalTimestamp = timestamp;
                 List<Chat> chatList = DataSupport.where("uid = ?", conversation.getUid() + "").find(Chat.class);
                 for (int j = 0; j < chatList.size(); j++) {
@@ -127,7 +127,7 @@ public class ConversationFragment extends BaseFragment {
                     byte[] chatMessage = chat.getMessage();
                     int senderId = MessageUtils.getSenderid(chatMessage);
                     int receiverId = MessageUtils.getReceiverid(chatMessage);
-                    if (senderId == userinfo.getResData().getId() || receiverId == userinfo.getResData().getId()) {
+                    if (senderId == chat.getUid() && receiverId == userinfo.getResData().getId()) {
                         if (MessageUtils.getTime(chatMessage) > finalTimestamp/1000) {
                             unreadnumber++;
                         }
@@ -258,7 +258,7 @@ public class ConversationFragment extends BaseFragment {
                     } else if (MessageUtils.getMessageType(conversation.getLastMessage()) == 2) {
                         mTvContent.setText("[图片]");
                     } else {
-                        mTvContent.setText(EmoParser.parseEmo(getActivity(), MessageUtils.getMessage(conversation.getLastMessage()), 20));
+                        mTvContent.setText(EmoParser.parseEmo(getActivity(), new String(MessageUtils.getMessageContent(conversation.getLastMessage())), 20));
                     }
                     mConversationItem.setOnClickListener(new View.OnClickListener() {
                         @Override

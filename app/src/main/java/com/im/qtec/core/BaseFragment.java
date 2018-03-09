@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import com.im.qtec.utils.L;
 
 
+
 /**
- * Created by Stay on 22/10/15.
- * Powered by www.stay4it.com
+ * @author zhouyanglei
  */
 public abstract class BaseFragment extends Fragment {
     private boolean isVisibleToUser;
@@ -23,6 +23,7 @@ public abstract class BaseFragment extends Fragment {
     private boolean isLazyLoadEnabled;
 
     public abstract void setUpView(View view);
+
     public abstract void setUpData();
 
     public void enableLazyLoad(){

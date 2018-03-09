@@ -1,10 +1,10 @@
 package com.im.qtec.entity;
 
 /**
- * Created by zhouyanglei on 2017/12/20.
+ * Created by zhouyanglei on 2018/2/28.
  */
 
-public class KeyResultEntity {
+public class KeyIdResultEntity {
 
     /**
      * flag : true

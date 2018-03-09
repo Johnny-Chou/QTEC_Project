@@ -17,4 +17,6 @@ public class UrlHelper {
     public static String UPLOAD_FILE = BASE_URL +"/talkserver/uploadConfig.do";
     public static String LOGOUT_URL = BASE_URL +"/talkserver/logout.do";
     public static String UPDATE_PASSWORD = BASE_URL +"/talkserver/updatePasswd.do";
+    public static String GET_CODE = BASE_URL +"/talkserver/getCode.do";
+    public static String FIND_CODE = BASE_URL +"/talkserver/findCode.do";
 }

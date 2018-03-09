@@ -14,10 +14,13 @@ import android.util.Log;
 
 import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.load.Key;
 import com.im.qtec.constants.ConstantValues;
 import com.im.qtec.db.Chat;
 import com.im.qtec.db.Contact;
 import com.im.qtec.db.Conversation;
+import com.im.qtec.entity.KeyIdRequestEntity;
+import com.im.qtec.entity.KeyIdResultEntity;
 import com.im.qtec.event.MessageEvent;
 import com.im.qtec.utils.HttpEngin;
 import com.im.qtec.utils.MessageUtils;
@@ -36,9 +39,18 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import cn.qtec.qkcl.crypto.enums.EEncrypAlg;
+import cn.qtec.qkcl.envelope.EnvelopEnc;
+import cn.qtec.qkcl.envelope.EnvelopEncInterface;
+import cn.qtec.qkcl.envelope.future.StopableFuture;
+import cn.qtec.qkcl.envelope.pojo.QtKey;
+import cn.qtec.qkcl.envelope.pojo.QtKeyId;
+import cn.qtec.qkcl.envelope.pojo.QtRecipientInfo;
 import okhttp3.Call;
 
 public class MQTTService extends Service {
@@ -72,7 +84,7 @@ public class MQTTService extends Service {
         Boolean retained = false;
         try {
             client.publish(topic, msg, qos.intValue(), retained.booleanValue());
-            saveMessage(msg, 1, userid);
+//            saveMessage(msg, 1, userid);
             EventBus.getDefault().post(new MessageEvent());
         } catch (MqttException e) {
             e.printStackTrace();
@@ -195,7 +207,7 @@ public class MQTTService extends Service {
         String suffix = split[split.length - 1];
         return UUID.randomUUID().toString() + "." + suffix;
     }*/
-    
+
 
     // MQTT监听并且接受消息
     private MqttCallback mqttCallback = new MqttCallback() {
@@ -212,9 +224,57 @@ public class MQTTService extends Service {
                 final int uid = Integer.valueOf(userid);
                 final byte[] payload = message.getPayload();
                 MessageUtils.setTime(payload,System.currentTimeMillis()/1000);
-                if (MessageUtils.getMessageType(payload) != CHAT_TYPE_MESSAGE) {
+
+                String messageKeyId = new String(MessageUtils.getMessageKeyId(payload));
+                HttpEngin.getInstance().post(UrlHelper.FIND_CODE, new KeyIdRequestEntity(myid, DeviceUtils.getAndroidID(), messageKeyId)
+                        , KeyIdResultEntity.class, new HttpEngin.HttpListener<KeyIdResultEntity>() {
+                            @Override
+                            public void onError(Call call, Exception e, int id) {
+                                ToastUtils.showLong("获取密钥失败");
+                            }
+
+                            @Override
+                            public void onResponse(KeyIdResultEntity result, int id) {
+
+                                String key = result.getResData().getValue();
+                                if (MessageUtils.getMessageType(payload) != CHAT_TYPE_MESSAGE) {
+                                    String fileUrl = new String(MessageUtils.getMessageContent(payload));
+                                    String suffix = fileUrl.substring(fileUrl.lastIndexOf("."));
+                                    HttpEngin.getInstance().getFile(fileUrl, getFilesDir().getAbsolutePath()+"/qtec", UUID.randomUUID()+suffix, new HttpEngin.FileLoadListener<String>() {
+                                        @Override
+                                        public void inProgress(float progress, long total, int id) {
+                                        }
+
+                                        @Override
+                                        public void onError(Call call, Exception e, int id) {
+                                            ToastUtils.showLong("接收失败");
+                                        }
+
+                                        @Override
+                                        public void onResponse(String s, int id) {
+                                            int lastIndex = s.lastIndexOf(".");
+                                            String decryptPath = s.substring(0,lastIndex) + "decrypt" + suffix;
+                                            decryptFile(s,decryptPath,messageKeyId,key);
+                                            File decryptFile = new File(decryptPath);
+                                            if (decryptFile.exists() && decryptFile.isDirectory()){
+                                                File[] files = decryptFile.listFiles();
+                                                saveMessage(MessageUtils.setMessageContent(payload, files[0].getAbsolutePath().getBytes()), 0, uid);
+                                                EventBus.getDefault().post(new MessageEvent());
+                                            }
+                                        }
+                                    });
+                                }else {
+                                    byte[] decryptedMessage = MessageUtils.getDecryptedMessage(payload, key);
+                                    saveMessage(decryptedMessage, 0, uid);
+                                    EventBus.getDefault().post(new MessageEvent());
+                                }
+                            }
+                        });
+
+                /*if (MessageUtils.getMessageType(payload) != CHAT_TYPE_MESSAGE) {
                     String fileUrl = new String(MessageUtils.getMessageContent(payload));
                     String suffix = fileUrl.substring(fileUrl.lastIndexOf("."));
+                    byte[] messageKeyId = MessageUtils.getMessageKeyId(payload);
                     HttpEngin.getInstance().getFile(fileUrl, getFilesDir().getAbsolutePath(), UUID.randomUUID()+suffix, new HttpEngin.FileLoadListener<String>() {
                         @Override
                         public void inProgress(float progress, long total, int id) {
@@ -227,14 +287,29 @@ public class MQTTService extends Service {
 
                         @Override
                         public void onResponse(String s, int id) {
+
                             saveMessage(MessageUtils.setMessageContent(payload, s.getBytes()), 0, uid);
                             EventBus.getDefault().post(new MessageEvent());
                         }
                     });
                 } else {
-                    saveMessage(payload, 0, uid);
-                    EventBus.getDefault().post(new MessageEvent());
-                }
+                    String messageKeyId = new String(MessageUtils.getMessageKeyId(payload));
+                    HttpEngin.getInstance().post(UrlHelper.FIND_CODE, new KeyIdRequestEntity(myid, DeviceUtils.getAndroidID(), messageKeyId)
+                            , KeyIdResultEntity.class, new HttpEngin.HttpListener<KeyIdResultEntity>() {
+                                @Override
+                                public void onError(Call call, Exception e, int id) {
+                                    ToastUtils.showLong("获取密钥失败");
+                                }
+
+                                @Override
+                                public void onResponse(KeyIdResultEntity result, int id) {
+                                    String key = result.getResData().getValue();
+                                    byte[] decryptedMessage = MessageUtils.getDecryptedMessage(payload, key);
+                                    saveMessage(decryptedMessage, 0, uid);
+                                    EventBus.getDefault().post(new MessageEvent());
+                                }
+                            });
+                }*/
             }
 //            String str2 = topic + ";qos:" + message.getQos() + ";retained:" + message.isRetained();
 //            Log.i(TAG, "messageArrived:" + str1);
@@ -252,6 +327,38 @@ public class MQTTService extends Service {
             doClientConnection();
         }
     };
+
+    private void decryptFile(String path, String decryptPath,String keyId,String key) {
+        EnvelopEncInterface envelopEnc = EnvelopEnc.getInstance();
+        //模拟创建接收者信息
+        List<QtRecipientInfo> list = new ArrayList<>();
+        QtRecipientInfo qtRecipientInfo = new QtRecipientInfo();
+        //设置接收者的算法
+        qtRecipientInfo.seteEncrypAlg(EEncrypAlg.AES256_CBC_PKCS5PADDING);
+        //模拟生成一个接收者的共享密钥
+        QtKey qtKey = new QtKey();
+        //模拟生成一个接收者的密钥id
+        QtKeyId qtKeyId = new QtKeyId();
+        for(int i=0;i<qtKeyId.getBuffer().length;i++){
+            qtKeyId.getBuffer()[i] = keyId.getBytes()[i];
+        }
+        for(int i=0;i<qtKey.getBuffer().length;i++){
+            qtKey.getBuffer()[i] = key.getBytes()[i];
+        }
+
+        qtRecipientInfo.setKeyId(qtKeyId);
+        qtRecipientInfo.setKey(qtKey);
+        list.add(qtRecipientInfo);
+
+        try {
+            StopableFuture future = envelopEnc.decryptFile(path, qtKeyId,qtKey, decryptPath);
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     private void saveMessage(byte[] message, int isSend, int id) {
         List<Contact> contacts = DataSupport.where("uid = ?", id + "").find(Contact.class);
@@ -308,5 +415,8 @@ public class MQTTService extends Service {
             publish(yourMsg, userid, myMsg);
         }
 
+        public void savePlainMessage(byte[] msg, int userid) {
+            saveMessage(msg,1, userid);
+        }
     }
 }

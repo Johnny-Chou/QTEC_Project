@@ -57,7 +57,6 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
     protected void setUpData(Bundle savedInstanceState) {
         startMqttService();
         initTabs();
-        getKeys();
         EventBus.getDefault().register(this);
     }
 
@@ -78,15 +77,6 @@ public class HomeActivity extends BaseActivity implements TabLayout.OnTabClickLi
         mTabLayout.setCurrentTab(0);
     }
 
-    private void getKeys() {
-        Info userinfo = new Gson().fromJson(SPUtils.getString(this, ConstantValues.USER_INFO,""),Info.class);
-        String keys = SPUtils.getString(this, ConstantValues.KEYS, "");
-        if (keys.length() < 10 * 16){
-            HttpEngin.getInstance().post(UrlHelper.GET_KEY,
-                    new KeyRequestEntity(userinfo.getResData().getId(), DeviceUtils.getAndroidID(),50 * 16),
-                    KeyResultEntity.class,this);
-        }
-    }
 
     @Override
     protected void onResume() {

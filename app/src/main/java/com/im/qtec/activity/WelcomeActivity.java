@@ -2,7 +2,9 @@ package com.im.qtec.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -21,6 +23,19 @@ import com.im.qtec.utils.UrlHelper;
 
 import org.reactivestreams.Subscriber;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import cn.qtec.qkcl.crypto.enums.EEncrypAlg;
+import cn.qtec.qkcl.envelope.EnvelopEnc;
+import cn.qtec.qkcl.envelope.EnvelopEncInterface;
+import cn.qtec.qkcl.envelope.future.StopableFuture;
+import cn.qtec.qkcl.envelope.pojo.QtKey;
+import cn.qtec.qkcl.envelope.pojo.QtKeyId;
+import cn.qtec.qkcl.envelope.pojo.QtRecipientInfo;
+import cn.qtec.qkcl.envelope.pojo.ResultInfo;
 import io.reactivex.Emitter;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -46,6 +61,54 @@ public class WelcomeActivity extends BaseActivity implements HttpEngin.HttpListe
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
         super.onCreate(savedInstanceState);
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                haha();
+            }
+        }.start();
+    }
+
+    private void haha() {
+        decryptFile(Environment.getExternalStorageDirectory().getAbsolutePath()+"/qtec/1encrypt.amr",Environment.getExternalStorageDirectory().getAbsolutePath()+"/qtec/1decrypt.amr",
+                "111111111111111111111111111111111111111111111","111111111111111111111111111111111111111111111");
+    }
+
+    private void decryptFile(String path, String decryptPath, String keyId, String key) {
+        EnvelopEncInterface envelopEnc = EnvelopEnc.getInstance();
+        //模拟创建接收者信息
+        List<QtRecipientInfo> list = new ArrayList<>();
+        QtRecipientInfo qtRecipientInfo = new QtRecipientInfo();
+        //设置接收者的算法
+        qtRecipientInfo.seteEncrypAlg(EEncrypAlg.AES256_CBC_PKCS5PADDING);
+        //模拟生成一个接收者的共享密钥
+        QtKey qtKey = new QtKey();
+        //模拟生成一个接收者的密钥id
+        QtKeyId qtKeyId = new QtKeyId();
+        for (int i = 0; i < qtKeyId.getBuffer().length; i++) {
+            qtKeyId.getBuffer()[i] = keyId.getBytes()[i];
+        }
+        for (int i = 0; i < qtKey.getBuffer().length; i++) {
+            qtKey.getBuffer()[i] = key.getBytes()[i];
+        }
+
+        qtRecipientInfo.setKeyId(qtKeyId);
+        qtRecipientInfo.setKey(qtKey);
+        list.add(qtRecipientInfo);
+
+        try {
+            StopableFuture future = envelopEnc.decryptFile(path, qtKeyId, qtKey, decryptPath);
+            float processPercent = future.getProcessPercent();
+            Thread.sleep(1000);
+            processPercent = future.getProcessPercent();
+            future.get();
+            File file = new File(decryptPath);
+            boolean exists = file.exists();
+            System.out.println("a");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -24,7 +24,7 @@ public class MyApplication extends LitePalApplication {
         super.onCreate();
         AppStatusTracker.init(this);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                //.addInterceptor(new LoggerInterceptor("TAG", true))
+                .addInterceptor(new LoggerInterceptor("TAG", true))
                 .connectTimeout(10000L, TimeUnit.MILLISECONDS)
                 .readTimeout(10000L, TimeUnit.MILLISECONDS)
                 //其他配置

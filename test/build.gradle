@@ -1,7 +1,14 @@
 apply plugin: 'java-library'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/bcprov-jdk15on-1.56.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/crypto-1.0.0.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/jasn1-1.8.2.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/JQtCrypto-1.0.0-SNAPSHOT.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/slf4j-api-1.7.25.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/SwxaJCE-1.0.0.jar')
+    implementation files('/Users/zhouyanglei/Desktop/im_android/app/libs/envelope.jar')
 }
 
 sourceCompatibility = "1.7"

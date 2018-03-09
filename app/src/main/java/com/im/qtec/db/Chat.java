@@ -22,7 +22,7 @@ public class Chat extends DataSupport {
 //    ChatType_GROUP_TYPE_OTHER,//群聊其他文件
 //    ChatType_GROUP_TYPE_COUNT,//所有群聊
 //    [data appendBytes:&headerSize length:sizeof(headerSize)]; //定义协议头长度     2 字节
-//    [data appendBytes:key.UTF8String length:16];    //密钥                       16 字节
+//    [data appendBytes:key.UTF8String length:16];    //密钥                       36 字节
 //    [data appendBytes:&fromUserId length:sizeof(fromUserId)];//发送者ID           4 字节
 //    [data appendBytes:&toUserId length:sizeof(toUserId)];//接收者ID               4 字节
 //    [data appendBytes:&sendType length:sizeof(sendType)];//消息类型                1 字节
